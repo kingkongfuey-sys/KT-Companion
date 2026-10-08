@@ -8,24 +8,35 @@ on:
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
 
     steps:
-
-      - name: Checkout
+      - name: Checkout Repository
         uses: actions/checkout@v4
 
-      - name: Setup Node
+      - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 20
 
-      - name: Install Packages
+      - name: Install Dependencies
         run: npm install
 
+      - name: Show Repository Structure
+        run: |
+          echo "Repository Root"
+          ls -la
+
+          echo ""
+          echo "WWW Folder"
+          ls -la www
+
+          echo ""
+          echo "Resources Folder"
+          ls -la resources
+
       - name: Add Android Platform
-        run: npx cap add android || true
+        run: npx cap add android
 
       - name: Generate Adaptive Icons
         run: npx capacitor-assets generate
@@ -39,7 +50,12 @@ jobs:
           distribution: temurin
           java-version: 21
 
-      - name: Build APK
+      - name: Verify Android Platform
+        run: |
+          ls -la android
+          ls -la android/app
+
+      - name: Build Debug APK
         run: |
           cd android
           chmod +x gradlew
