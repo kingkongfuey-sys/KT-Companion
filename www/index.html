@@ -2655,7 +2655,7 @@ html[data-chaos] body::before{content:"";position:fixed;inset:0;pointer-events:n
 html[data-chaos] .kt-word{text-shadow:0 0 10px rgba(255,40,40,.45)}
 html[data-chaos] .kt-word i{color:#ff4b4b}
 html[data-chaos] .kt-mark:not([class*=kt-a-]){animation:ktEyes 2.6s ease-in-out infinite}
-.kt-embers span{position:fixed;bottom:-14px;left:var(--x);width:var(--s);height:var(--s);border-radius:50%;background:radial-gradient(circle,#ffb27a,#e01e1e 55%,transparent 72%);opacity:0;pointer-events:none;z-index:1;animation:kbEmber var(--t) linear var(--dl) infinite}
+.kt-embers span{position:fixed;bottom:-14px;left:var(--x);width:var(--s);height:var(--s);border-radius:50%;background:radial-gradient(circle,#ffb27a,#e01e1e 55%,transparent 72%);opacity:0;pointer-events:none;z-index:120;animation:kbEmber var(--t) linear var(--dl) infinite}
 @keyframes kbEmber{0%{opacity:0;transform:translate(0,0) scale(1)}12%{opacity:.85}60%{opacity:.5}100%{opacity:0;transform:translate(var(--sx),-108vh) scale(.4)}}
 .kb{position:fixed;inset:0;z-index:10050;overflow:hidden;opacity:0;animation:kbIn .5s forwards;touch-action:none}
 .kb.out{animation:kbOut .9s forwards;pointer-events:none}
@@ -2684,7 +2684,7 @@ html[data-chaos] .kt-mark:not([class*=kt-a-]){animation:ktEyes 2.6s ease-in-out 
 html[data-nurgle] body{background:var(--bg)}
 html[data-nurgle] body::before{content:"";position:fixed;inset:0;pointer-events:none;z-index:0;background:radial-gradient(ellipse at 50% -10%,rgba(90,120,30,.30),transparent 55%),radial-gradient(ellipse at 50% 110%,rgba(50,70,15,.45),transparent 60%)}
 /* permanent slime bar across the top of the viewport, with a slow squelching pulse */
-html[data-nurgle] body::after{content:"";position:fixed;top:0;left:0;right:0;height:7px;z-index:99;pointer-events:none;background:linear-gradient(#7a9c3a,#3c4d18);box-shadow:0 1px 4px rgba(0,0,0,.5);animation:nbSquelch 6s ease-in-out infinite}
+html[data-nurgle] body::after{content:"";position:fixed;top:0;left:0;right:0;height:7px;z-index:120;pointer-events:none;background:linear-gradient(#7a9c3a,#3c4d18);box-shadow:0 1px 4px rgba(0,0,0,.5);animation:nbSquelch 6s ease-in-out infinite}
 @keyframes nbSquelch{0%,100%{transform:scaleY(1)}50%{transform:scaleY(1.9)}}
 html[data-nurgle] .kt-word{text-shadow:0 0 10px rgba(140,220,60,.5)}
 html[data-nurgle] .kt-word i{color:#a4d24b}
@@ -2692,7 +2692,7 @@ html[data-nurgle] .kt-mark:not([class*=kt-a-]){animation:ktEyesG 3.2s ease-in-ou
 /* panels grow a weeping slime crown along their headers */
 html[data-nurgle] .player-card-header,html[data-nurgle] .critop-header,html[data-nurgle] .game-info,html[data-nurgle] .grand-block{background:linear-gradient(180deg,#25300f 0%,#131a0b 140%)!important}
 /* rising pus bubbles (ambient layer, like the Khorne embers) */
-.kt-spores{position:fixed;inset:0;pointer-events:none;z-index:1}
+.kt-spores{position:fixed;inset:0;pointer-events:none;z-index:120}
 .kt-spores span{position:fixed;bottom:-16px;left:var(--x);width:var(--s);height:var(--s);border-radius:50%;background:radial-gradient(circle at 32% 28%,#e3f2ae,#8bb43a 45%,#3c5510 78%);opacity:0;pointer-events:none;filter:blur(var(--bl,0));animation:nbSpore var(--t) linear var(--dl) infinite}
 @keyframes nbSpore{0%{opacity:0;transform:translate(0,0) scale(.6)}10%{opacity:.8}55%{opacity:.5}100%{opacity:0;transform:translate(var(--sx),-106vh) scale(1.25)}}
 /* fat flies buzzing in lazy loops */
@@ -2718,14 +2718,14 @@ html[data-nurgle] .player-card-header,html[data-nurgle] .critop-header,html[data
 html[data-tauva] body{background:var(--bg)}
 html[data-tauva] body::before{content:"";position:fixed;inset:0;pointer-events:none;z-index:0;background:radial-gradient(ellipse at 50% -10%,rgba(40,110,190,.28),transparent 55%),radial-gradient(ellipse at 50% 110%,rgba(15,60,110,.42),transparent 60%)}
 /* a soft light seam runs along the top of the viewport, breathing slowly */
-html[data-tauva] body::after{content:"";position:fixed;top:0;left:0;right:0;height:5px;z-index:99;pointer-events:none;background:linear-gradient(90deg,transparent,#6cc3ff 30%,#bfe6ff 50%,#6cc3ff 70%,transparent);opacity:.6;animation:tvSeam 7s ease-in-out infinite}
+html[data-tauva] body::after{content:"";position:fixed;top:0;left:0;right:0;height:5px;z-index:120;pointer-events:none;background:linear-gradient(90deg,transparent,#6cc3ff 30%,#bfe6ff 50%,#6cc3ff 70%,transparent);opacity:.6;animation:tvSeam 7s ease-in-out infinite}
 @keyframes tvSeam{0%,100%{opacity:.35}50%{opacity:.85}}
 html[data-tauva] .kt-word{text-shadow:0 0 10px rgba(108,195,255,.55)}
 html[data-tauva] .kt-word i{color:#6cc3ff}
 html[data-tauva] .kt-mark:not([class*=kt-a-]){animation:ktEyesB 3s ease-in-out infinite}
 html[data-tauva] .player-card-header,html[data-tauva] .critop-header,html[data-tauva] .game-info,html[data-tauva] .grand-block{background:linear-gradient(180deg,#0e2138 0%,#0b1624 140%)!important}
 /* ambient layer: caste motes rising + drifting T'au hex-glyphs (reused in the overlay) */
-.kt-motes{position:fixed;inset:0;pointer-events:none;z-index:1}
+.kt-motes{position:fixed;inset:0;pointer-events:none;z-index:120}
 .tv-mote{position:absolute;bottom:-16px;left:var(--l);width:var(--s);height:var(--s);border-radius:50%;background:var(--c);box-shadow:0 0 8px var(--c);opacity:0;pointer-events:none;animation:tvMote var(--d) linear var(--dl) infinite}
 @keyframes tvMote{0%{opacity:0;transform:translate(0,0)}10%{opacity:.85}60%{opacity:.5}100%{opacity:0;transform:translate(var(--sx),-104vh)}}
 .tv-glyph{position:absolute;top:-34px;left:var(--l);width:var(--s);height:calc(var(--s)*.82);background:rgba(150,210,255,.35);clip-path:polygon(25% 0,75% 0,100% 50%,75% 100%,25% 100%,0 50%);opacity:0;pointer-events:none;animation:tvGlyph var(--d) linear var(--dl) infinite}
@@ -2748,14 +2748,14 @@ html[data-tauva] .player-card-header,html[data-tauva] .critop-header,html[data-t
 html[data-imperium] body{background:var(--bg)}
 html[data-imperium] body::before{content:"";position:fixed;inset:0;pointer-events:none;z-index:0;background:radial-gradient(ellipse at 50% -10%,rgba(212,160,23,.24),transparent 55%),radial-gradient(ellipse at 50% 110%,rgba(120,20,25,.28),transparent 60%)}
 /* a gilded trim runs along the top of the viewport, shimmering slowly */
-html[data-imperium] body::after{content:"";position:fixed;top:0;left:0;right:0;height:6px;z-index:99;pointer-events:none;background:linear-gradient(90deg,#6e161c,#d4a017 18%,#f7e08a 50%,#d4a017 82%,#6e161c);opacity:.65;animation:imTrim 8s ease-in-out infinite}
+html[data-imperium] body::after{content:"";position:fixed;top:0;left:0;right:0;height:6px;z-index:120;pointer-events:none;background:linear-gradient(90deg,#6e161c,#d4a017 18%,#f7e08a 50%,#d4a017 82%,#6e161c);opacity:.65;animation:imTrim 8s ease-in-out infinite}
 @keyframes imTrim{0%,100%{opacity:.45}50%{opacity:.9}}
 html[data-imperium] .kt-word{text-shadow:0 0 10px rgba(240,192,64,.5)}
 html[data-imperium] .kt-word i{color:#f0c040}
 html[data-imperium] .kt-mark:not([class*=kt-a-]){animation:ktEyes 3s ease-in-out infinite}
 html[data-imperium] .player-card-header,html[data-imperium] .critop-header,html[data-imperium] .game-info,html[data-imperium] .grand-block{background:linear-gradient(180deg,#26180a 0%,#161008 140%)!important}
 /* ambient: votive candles flickering along the viewport's edge */
-.kt-candles{position:fixed;inset:0;pointer-events:none;z-index:1}
+.kt-candles{position:fixed;inset:0;pointer-events:none;z-index:120}
 .im-candle{position:absolute;bottom:0;left:var(--l);width:var(--w);height:14px;background:linear-gradient(180deg,#d8d2c0,#9a9483);border-radius:2px 2px 0 0;pointer-events:none}
 .im-candle::before{content:"";position:absolute;top:-11px;left:50%;margin-left:-2.5px;width:5px;height:10px;border-radius:50% 50% 45% 45%;background:radial-gradient(ellipse at 50% 78%,#fff6d8 0 18%,#ffb52a 42%,#e0641e 78%,transparent 100%);transform-origin:50% 100%;animation:imFlicker var(--d) ease-in-out var(--dl) infinite}
 .im-candle::after{content:"";position:absolute;top:-26px;left:50%;margin-left:-13px;width:26px;height:26px;border-radius:50%;background:radial-gradient(circle,rgba(255,180,50,.4),transparent 70%);animation:imGlow var(--d) ease-in-out var(--dl) infinite}
@@ -2788,14 +2788,14 @@ html[data-imperium] .player-card-header,html[data-imperium] .critop-header,html[
 html[data-necron] body{background:var(--bg)}
 html[data-necron] body::before{content:"";position:fixed;inset:0;pointer-events:none;z-index:0;background:radial-gradient(ellipse at 50% -10%,rgba(30,184,113,.18),transparent 55%),radial-gradient(ellipse at 50% 110%,rgba(10,40,30,.5),transparent 60%)}
 /* a gauss energy seam runs along the top of the viewport, pulsing like a recharging weapon */
-html[data-necron] body::after{content:"";position:fixed;top:0;left:0;right:0;height:4px;z-index:99;pointer-events:none;background:linear-gradient(90deg,transparent,#35e065 30%,#b8ffd2 50%,#35e065 70%,transparent);opacity:.5;animation:ncSeam 5s ease-in-out infinite}
+html[data-necron] body::after{content:"";position:fixed;top:0;left:0;right:0;height:4px;z-index:120;pointer-events:none;background:linear-gradient(90deg,transparent,#35e065 30%,#b8ffd2 50%,#35e065 70%,transparent);opacity:.5;animation:ncSeam 5s ease-in-out infinite}
 @keyframes ncSeam{0%,100%{opacity:.2}50%{opacity:.8}}
 html[data-necron] .kt-word{text-shadow:0 0 10px rgba(53,224,101,.55)}
 html[data-necron] .kt-word i{color:#35e065}
 html[data-necron] .kt-mark:not([class*=kt-a-]){animation:ktEyesG 3.4s ease-in-out infinite}
 html[data-necron] .player-card-header,html[data-necron] .critop-header,html[data-necron] .game-info,html[data-necron] .grand-block{background:linear-gradient(180deg,#101c1a 0%,#0d1317 140%)!important}
 /* ambient layer: scarab scarabs crawling the void + glyph sparks + gauss flickers */
-.kt-scarabs{position:fixed;inset:0;pointer-events:none;z-index:1}
+.kt-scarabs{position:fixed;inset:0;pointer-events:none;z-index:120}
 .nc-scarab{position:absolute;top:var(--t);left:-30px;width:9px;height:7px;border-radius:60% 40% 55% 45%/70% 70% 40% 40%;background:radial-gradient(circle at 60% 40%,#2a3a35,#0c1512 80%);box-shadow:inset -1.5px 0 0 rgba(53,224,101,.4),1.5px 0 0 rgba(53,224,101,.25);pointer-events:none;animation:ncCrawl var(--d) linear var(--dl) infinite}
 @keyframes ncCrawl{0%{transform:translate(0,0) scaleX(1)}25%{transform:translate(calc(100vw*.25),-10px) scaleX(1)}50%{transform:translate(calc(100vw*.5),6px) scaleX(1)}75%{transform:translate(calc(100vw*.75),-8px) scaleX(1)}100%{transform:translate(calc(100vw + 60px),0) scaleX(1)}}
 .nc-spark{position:absolute;bottom:-12px;left:var(--l);width:var(--s);height:var(--s);border-radius:50%;background:radial-gradient(circle,#d9ffe6,#35e065 55%,transparent 85%);opacity:0;pointer-events:none;animation:ncSpark var(--d) linear var(--dl) infinite}
@@ -2821,13 +2821,13 @@ html[data-necron] .player-card-header,html[data-necron] .critop-header,html[data
 :root:root:root[data-aeldari]{--bg:#080b12;--panel:#101624;--panel-alt:#171f30;--input-bg:#080b12;--border:#3a4a6e;--border-soft:#232f4a;--text:#e6ecf7;--text-dim:#9dabc6;--text-faint:#9dabc6;--black:#050810;--orange:#d66a9c;--orange-dark:#a04a74;--orange-text:#e88fb8;--on-fill:#fff;--crit-color:#d66a9c;--red:#b0584e;--red-text:#d0867e;--red-dark:#6e3230;--green:#7cd6c9;--tac-color:#8f9ed6;--tac-color-dark:#5a68a0}
 html[data-aeldari] body{background:var(--bg)}
 html[data-aeldari] body::before{content:"";position:fixed;inset:0;pointer-events:none;z-index:0;background:radial-gradient(ellipse at 50% -10%,rgba(214,106,156,.16),transparent 55%),radial-gradient(ellipse at 50% 110%,rgba(60,90,180,.24),transparent 60%)}
-html[data-aeldari] body::after{content:"";position:fixed;top:0;left:0;right:0;height:4px;z-index:99;pointer-events:none;background:linear-gradient(90deg,transparent,#8fd6ff 30%,#e88fb8 50%,#8fd6ff 70%,transparent);opacity:.5;animation:ncSeam 6s ease-in-out infinite}
+html[data-aeldari] body::after{content:"";position:fixed;top:0;left:0;right:0;height:4px;z-index:120;pointer-events:none;background:linear-gradient(90deg,transparent,#8fd6ff 30%,#e88fb8 50%,#8fd6ff 70%,transparent);opacity:.5;animation:ncSeam 6s ease-in-out infinite}
 html[data-aeldari] .kt-word{text-shadow:0 0 10px rgba(232,143,184,.5)}
 html[data-aeldari] .kt-word i{color:#e88fb8}
 html[data-aeldari] .kt-mark:not([class*=kt-a-]){animation:ktEyesB 3.2s ease-in-out infinite}
 html[data-aeldari] .player-card-header,html[data-aeldari] .critop-header,html[data-aeldari] .game-info,html[data-aeldari] .grand-block{background:linear-gradient(180deg,#1a2440 0%,#101624 140%)!important}
 /* ambient: soulfire wisps rising from the Infinity Circuit + spirit runes drifting */
-.kt-wisps{position:fixed;inset:0;pointer-events:none;z-index:1}
+.kt-wisps{position:fixed;inset:0;pointer-events:none;z-index:120}
 .al-wisp{position:absolute;bottom:-16px;left:var(--l);width:var(--s);height:calc(var(--s)*1.4);border-radius:50% 50% 50% 50%/60% 60% 40% 40%;background:radial-gradient(ellipse at 50% 30%,var(--c),transparent 75%);filter:blur(1px);opacity:0;pointer-events:none;animation:alWisp var(--d) ease-in-out var(--dl) infinite}
 @keyframes alWisp{0%{opacity:0;transform:translate(0,0) scale(.5)}15%{opacity:.7}55%{opacity:.45;transform:translate(var(--sx),-55vh) scale(1.15)}100%{opacity:0;transform:translate(calc(var(--sx)*1.6),-102vh) scale(.6)}}
 .al-rune{position:absolute;top:-34px;left:var(--l);width:var(--s);height:calc(var(--s)*.82);border:2px solid var(--c);border-radius:50% 0;transform:rotate(45deg);opacity:0;pointer-events:none;animation:alRune var(--d) linear var(--dl) infinite}
@@ -2846,14 +2846,14 @@ html[data-aeldari] .player-card-header,html[data-aeldari] .critop-header,html[da
 :root:root:root[data-ork]{--bg:#0c0e08;--panel:#171a0e;--panel-alt:#222616;--input-bg:#0c0e08;--border:#5e6b2e;--border-soft:#38421c;--text:#f0eeda;--text-dim:#b0b284;--text-faint:#b0b284;--black:#080a05;--orange:#ffde3c;--orange-dark:#c9a30e;--orange-text:#ffde3c;--on-fill:#1a1c10;--crit-color:#ffde3c;--red:#e04c38;--red-text:#ff7a66;--red-dark:#8a281c;--green:#6fbf3a;--tac-color:#9cb83e;--tac-color-dark:#6e842a}
 html[data-ork] body{background:var(--bg)}
 html[data-ork] body::before{content:"";position:fixed;inset:0;pointer-events:none;z-index:0;background:radial-gradient(ellipse at 50% -10%,rgba(255,222,60,.14),transparent 55%),radial-gradient(ellipse at 50% 110%,rgba(224,76,56,.16),transparent 60%)}
-html[data-ork] body::after{content:"";position:fixed;top:0;left:0;right:0;height:6px;z-index:99;pointer-events:none;background:repeating-linear-gradient(90deg,#ffde3c 0 14px,#e04c38 14px 22px,#6fbf3a 22px 40px);opacity:.5;animation:okTrim 4s steps(6) infinite}
+html[data-ork] body::after{content:"";position:fixed;top:0;left:0;right:0;height:6px;z-index:120;pointer-events:none;background:repeating-linear-gradient(90deg,#ffde3c 0 14px,#e04c38 14px 22px,#6fbf3a 22px 40px);opacity:.5;animation:okTrim 4s steps(6) infinite}
 @keyframes okTrim{0%,100%{background-position:0 0}50%{background-position:40px 0}}
 html[data-ork] .kt-word{text-shadow:0 0 10px rgba(255,222,60,.5)}
 html[data-ork] .kt-word i{color:#ffde3c}
 html[data-ork] .kt-mark:not([class*=kt-a-]){animation:ktEyesG 2.4s ease-in-out infinite}
 html[data-ork] .player-card-header,html[data-ork] .critop-header,html[data-ork] .game-info,html[data-ork] .grand-block{background:linear-gradient(180deg,#2a3018 0%,#171a0e 140%)!important}
 /* ambient: teef an' toofz driftin' about + WAAAGH lightning flickers + dakka sparks */
-.kt-waaagh{position:fixed;inset:0;pointer-events:none;z-index:1}
+.kt-waaagh{position:fixed;inset:0;pointer-events:none;z-index:120}
 .ok-toof{position:absolute;top:-30px;left:var(--l);width:var(--s);height:calc(var(--s)*1.15);background:radial-gradient(ellipse at 50% 20%,#fffbe8,#d6cfa8 70%);border-radius:46% 54% 50% 50%/60% 60% 42% 42%;opacity:0;pointer-events:none;animation:okFallV var(--d) linear var(--dl) infinite}
 @keyframes okFallV{0%{opacity:0;transform:translate(0,0) rotate(0)}10%{opacity:.85}100%{opacity:0;transform:translate(var(--sx),102vh) rotate(540deg)}}
 .ok-bolt{position:absolute;top:0;bottom:0;left:var(--l);width:3px;background:linear-gradient(180deg,#fff,#ffde3c 30%,#e04c38 70%,transparent);opacity:0;pointer-events:none;filter:drop-shadow(0 0 6px #e04c38);animation:ncBolt var(--d) linear var(--dl) infinite}
@@ -2873,13 +2873,13 @@ html[data-ork] .player-card-header,html[data-ork] .critop-header,html[data-ork] 
 :root:root:root[data-tyranid]{--bg:#0a0810;--panel:#151020;--panel-alt:#1f1830;--input-bg:#0a0810;--border:#4e3a6e;--border-soft:#2e2246;--text:#e4ddf2;--text-dim:#a598c2;--text-faint:#a598c2;--black:#060512;--orange:#a35cd6;--orange-dark:#74399e;--orange-text:#c08ae6;--on-fill:#fff;--crit-color:#a35cd6;--red:#c0586e;--red-text:#da8a9e;--red-dark:#7a3244;--green:#7ce065;--tac-color:#8f6ec0;--tac-color-dark:#5a4490}
 html[data-tyranid] body{background:var(--bg)}
 html[data-tyranid] body::before{content:"";position:fixed;inset:0;pointer-events:none;z-index:0;background:radial-gradient(ellipse at 50% -10%,rgba(163,92,214,.18),transparent 55%),radial-gradient(ellipse at 50% 110%,rgba(20,60,30,.5),transparent 60%)}
-html[data-tyranid] body::after{content:"";position:fixed;top:0;left:0;right:0;height:5px;z-index:99;pointer-events:none;background:linear-gradient(90deg,transparent,#a35cd6 40%,#7ce065 50%,#a35cd6 60%,transparent);opacity:.5;animation:ncSeam 7s ease-in-out infinite}
+html[data-tyranid] body::after{content:"";position:fixed;top:0;left:0;right:0;height:5px;z-index:120;pointer-events:none;background:linear-gradient(90deg,transparent,#a35cd6 40%,#7ce065 50%,#a35cd6 60%,transparent);opacity:.5;animation:ncSeam 7s ease-in-out infinite}
 html[data-tyranid] .kt-word{text-shadow:0 0 10px rgba(192,138,230,.5)}
 html[data-tyranid] .kt-word i{color:#c08ae6}
 html[data-tyranid] .kt-mark:not([class*=kt-a-]){animation:ktEyes 3s ease-in-out infinite}
 html[data-tyranid] .player-card-header,html[data-tyranid] .critop-header,html[data-tyranid] .game-info,html[data-tyranid] .grand-block{background:linear-gradient(180deg,#241a38 0%,#151020 140%)!important}
 /* ambient: creeping biovore veins pulsing at the edges + drifting spores */
-.kt-swarm{position:fixed;inset:0;pointer-events:none;z-index:1}
+.kt-swarm{position:fixed;inset:0;pointer-events:none;z-index:120}
 .ty-vein{position:absolute;left:var(--l);bottom:0;width:var(--w);height:var(--h);border-radius:60% 40% 30% 70%/70% 30% 60% 40%;background:linear-gradient(180deg,rgba(124,224,101,.35),rgba(163,92,214,.18) 70%,transparent);filter:blur(1px);opacity:0;pointer-events:none;animation:tyVein var(--d) ease-in-out var(--dl) infinite}
 @keyframes tyVein{0%,100%{opacity:.25;transform:scaleY(.9)}50%{opacity:.6;transform:scaleY(1.05)}}
 .ty-spore{position:absolute;bottom:-14px;left:var(--l);width:var(--s);height:var(--s);border-radius:50%;background:radial-gradient(circle at 35% 30%,#e8d8ff,#a35cd6 55%,transparent 85%);opacity:0;pointer-events:none;animation:ncSpark var(--d) linear var(--dl) infinite}
@@ -2900,14 +2900,14 @@ html[data-tyranid] .player-card-header,html[data-tyranid] .critop-header,html[da
 html[data-slaanesh] body{background:var(--bg)}
 html[data-slaanesh] body::before{content:"";position:fixed;inset:0;pointer-events:none;z-index:0;background:radial-gradient(ellipse at 50% -10%,rgba(216,79,168,.26),transparent 55%),radial-gradient(ellipse at 50% 110%,rgba(60,20,80,.45),transparent 60%)}
 /* a silken pink seam shimmers along the top of the viewport */
-html[data-slaanesh] body::after{content:"";position:fixed;top:0;left:0;right:0;height:5px;z-index:99;pointer-events:none;background:linear-gradient(90deg,transparent,#d84fa8 30%,#f2c48a 50%,#d84fa8 70%,transparent);opacity:.6;animation:slSeam 6s ease-in-out infinite}
+html[data-slaanesh] body::after{content:"";position:fixed;top:0;left:0;right:0;height:5px;z-index:120;pointer-events:none;background:linear-gradient(90deg,transparent,#d84fa8 30%,#f2c48a 50%,#d84fa8 70%,transparent);opacity:.6;animation:slSeam 6s ease-in-out infinite}
 @keyframes slSeam{0%,100%{opacity:.4}50%{opacity:.9}}
 html[data-slaanesh] .kt-word{text-shadow:0 0 10px rgba(242,138,200,.55)}
 html[data-slaanesh] .kt-word i{color:#f28ac8}
 html[data-slaanesh] .kt-mark:not([class*=kt-a-]){animation:ktEyes 3.2s ease-in-out infinite}
 html[data-slaanesh] .player-card-header,html[data-slaanesh] .critop-header,html[data-slaanesh] .game-info,html[data-slaanesh] .grand-block{background:linear-gradient(180deg,#32183a 0%,#1c1020 140%)!important}
 /* ambient layer: drifting pink sparkles + lazy golden rings of excess */
-.kt-sparkles{position:fixed;inset:0;pointer-events:none;z-index:1}
+.kt-sparkles{position:fixed;inset:0;pointer-events:none;z-index:120}
 .sl-spark{position:fixed;bottom:-14px;left:var(--x);width:var(--s);height:var(--s);border-radius:50%;background:radial-gradient(circle at 35% 35%,#fff,#f28ac8 45%,#a03478 80%);box-shadow:0 0 7px rgba(242,138,200,.6);opacity:0;pointer-events:none;animation:slSpark var(--t) linear var(--dl) infinite}
 @keyframes slSpark{0%{opacity:0;transform:translate(0,0) scale(.6)}12%{opacity:.9}60%{opacity:.55}100%{opacity:0;transform:translate(var(--sx),-104vh) scale(1.1)}}
 .sl-ring{position:fixed;top:var(--t);left:var(--l);width:var(--s);height:var(--s);border-radius:50%;border:2px solid rgba(242,196,138,.55);opacity:0;pointer-events:none;animation:slRing var(--d) ease-in-out var(--dl) infinite}
@@ -2933,14 +2933,14 @@ html[data-slaanesh] .player-card-header,html[data-slaanesh] .critop-header,html[
 html[data-tzeentch] body{background:var(--bg)}
 html[data-tzeentch] body::before{content:"";position:fixed;inset:0;pointer-events:none;z-index:0;background:radial-gradient(ellipse at 50% -10%,rgba(46,158,232,.24),transparent 55%),radial-gradient(ellipse at 50% 110%,rgba(255,210,60,.10),transparent 60%)}
 /* a shifting seam of blue and flame-yellow crawls along the top of the viewport */
-html[data-tzeentch] body::after{content:"";position:fixed;top:0;left:0;right:0;height:5px;z-index:99;pointer-events:none;background:linear-gradient(90deg,transparent,#2e9ee8 28%,#ffd23c 50%,#2e9ee8 72%,transparent);background-size:220% 100%;opacity:.6;animation:tzSeam 7s linear infinite}
+html[data-tzeentch] body::after{content:"";position:fixed;top:0;left:0;right:0;height:5px;z-index:120;pointer-events:none;background:linear-gradient(90deg,transparent,#2e9ee8 28%,#ffd23c 50%,#2e9ee8 72%,transparent);background-size:220% 100%;opacity:.6;animation:tzSeam 7s linear infinite}
 @keyframes tzSeam{0%{background-position:0% 0}100%{background-position:-220% 0}}
 html[data-tzeentch] .kt-word{text-shadow:0 0 10px rgba(92,192,255,.55)}
 html[data-tzeentch] .kt-word i{color:#5cc0ff}
 html[data-tzeentch] .kt-mark:not([class*=kt-a-]){animation:ktEyesB 3s ease-in-out infinite}
 html[data-tzeentch] .player-card-header,html[data-tzeentch] .critop-header,html[data-tzeentch] .game-info,html[data-tzeentch] .grand-block{background:linear-gradient(180deg,#12244a 0%,#0c1428 140%)!important}
 /* ambient layer: rising warp-flame tongues + spinning yellow change-sparks */
-.kt-flames{position:fixed;inset:0;pointer-events:none;z-index:1}
+.kt-flames{position:fixed;inset:0;pointer-events:none;z-index:120}
 .tz-flame{position:fixed;bottom:-16px;left:var(--x);width:var(--s);height:calc(var(--s)*2.2);background:linear-gradient(180deg,#ffd23c,#2e9ee8 60%,#1a3a8e);clip-path:polygon(50% 0,68% 30%,100% 62%,72% 100%,28% 100%,0 62%,32% 30%);filter:blur(1px);opacity:0;pointer-events:none;animation:tzFlame var(--t) linear var(--dl) infinite}
 @keyframes tzFlame{0%{opacity:0;transform:translate(0,0) scale(.5) rotate(-8deg)}12%{opacity:.8}60%{opacity:.45}100%{opacity:0;transform:translate(var(--sx),-104vh) scale(1.1) rotate(8deg)}}
 .tz-spark{position:fixed;top:var(--t);left:var(--l);width:var(--s);height:var(--s);background:#ffd23c;clip-path:polygon(50% 0,62% 38%,100% 50%,62% 62%,50% 100%,38% 62%,0 50%,38% 38%);box-shadow:0 0 9px rgba(255,210,60,.7);opacity:0;pointer-events:none;animation:tzSpark var(--d) ease-in-out var(--dl) infinite}
@@ -2965,14 +2965,14 @@ html[data-tzeentch] .player-card-header,html[data-tzeentch] .critop-header,html[
 html[data-votann] body{background:var(--bg)}
 html[data-votann] body::before{content:"";position:fixed;inset:0;pointer-events:none;z-index:0;background:radial-gradient(ellipse at 50% -10%,rgba(232,156,38,.22),transparent 55%),radial-gradient(ellipse at 50% 110%,rgba(70,55,25,.45),transparent 60%)}
 /* a rune-etched gold trim runs along the top of the viewport */
-html[data-votann] body::after{content:"";position:fixed;top:0;left:0;right:0;height:6px;z-index:99;pointer-events:none;background:linear-gradient(90deg,#6a5018,#e89c26 20%,#ffe8a0 50%,#e89c26 80%,#6a5018);opacity:.6;animation:voTrim 8s ease-in-out infinite}
+html[data-votann] body::after{content:"";position:fixed;top:0;left:0;right:0;height:6px;z-index:120;pointer-events:none;background:linear-gradient(90deg,#6a5018,#e89c26 20%,#ffe8a0 50%,#e89c26 80%,#6a5018);opacity:.6;animation:voTrim 8s ease-in-out infinite}
 @keyframes voTrim{0%,100%{opacity:.45}50%{opacity:.85}}
 html[data-votann] .kt-word{text-shadow:0 0 10px rgba(248,188,72,.5)}
 html[data-votann] .kt-word i{color:#f8bc48}
 html[data-votann] .kt-mark:not([class*=kt-a-]){animation:ktEyes 3s ease-in-out infinite}
 html[data-votann] .player-card-header,html[data-votann] .critop-header,html[data-votann] .game-info,html[data-votann] .grand-block{background:linear-gradient(180deg,#2e2614 0%,#171410 140%)!important}
 /* ambient layer: rising gold runes + drifting forge sparks */
-.kt-runes{position:fixed;inset:0;pointer-events:none;z-index:1}
+.kt-runes{position:fixed;inset:0;pointer-events:none;z-index:120}
 .vo-rune{position:fixed;bottom:-24px;left:var(--x);width:var(--s);height:var(--s);background:rgba(248,188,72,.4);clip-path:polygon(50% 0,100% 50%,50% 100%,0 50%);opacity:0;pointer-events:none;animation:voRune var(--t) linear var(--dl) infinite}
 @keyframes voRune{0%{opacity:0;transform:translate(0,0) rotate(0)}12%{opacity:.6}60%{opacity:.35}100%{opacity:0;transform:translate(var(--sx),-104vh) rotate(220deg)}}
 .vo-spark{position:fixed;bottom:-14px;left:var(--x);width:var(--s);height:var(--s);border-radius:50%;background:radial-gradient(circle,#fff3c4,#f8bc48 55%,transparent 85%);box-shadow:0 0 6px rgba(248,188,72,.6);opacity:0;pointer-events:none;animation:voSpark var(--t) linear var(--dl) infinite}
