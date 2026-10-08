@@ -2,47 +2,49 @@ name: Build KT Companion APK
 
 on:
   workflow_dispatch:
-  push:
-    branches:
-      - main
 
 jobs:
   build:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout Repository
+      - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Setup Node.js
+      - name: Setup Node
         uses: actions/setup-node@v4
         with:
           node-version: 20
 
-      - name: Install Dependencies
+      - name: Install Packages
         run: npm install
 
-      - name: Show Repository Structure
+      - name: Verify Files
         run: |
-          echo "Repository Root"
+          echo "Root:"
           ls -la
 
-          echo ""
-          echo "WWW Folder"
+          echo "WWW:"
           ls -la www
 
-          echo ""
-          echo "Resources Folder"
+          echo "Resources:"
           ls -la resources
 
-      - name: Add Android Platform
+          echo "Config:"
+          cat capacitor.config.json
+
+      - name: Initialise Capacitor
+        run: |
+          npx cap init "KT Companion" "com.henryeveritt.ktcompanion" --web-dir=www
+
+      - name: Add Android
         run: npx cap add android
 
-      - name: Generate Adaptive Icons
+      - name: Generate Icons
         run: npx capacitor-assets generate
 
-      - name: Sync Capacitor
-        run: npx cap sync android
+      - name: Sync Android
+        run: npx cap sync
 
       - name: Setup Java
         uses: actions/setup-java@v4
@@ -50,12 +52,7 @@ jobs:
           distribution: temurin
           java-version: 21
 
-      - name: Verify Android Platform
-        run: |
-          ls -la android
-          ls -la android/app
-
-      - name: Build Debug APK
+      - name: Build APK
         run: |
           cd android
           chmod +x gradlew
