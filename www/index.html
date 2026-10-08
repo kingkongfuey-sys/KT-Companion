@@ -700,7 +700,10 @@ osFUFouFYZdn3aPfYwERPNIPBRiYt981gZ/0TZBIYpIWc/fvAADA/wcMSkFdR+1/XAAAAABJRU5ErkJg
   /* ---------------- sticky overall VP tracker ---------------- */
   .score-tracker{
     position:sticky;
-    top:0;
+    /* clears the device status bar when wrapped as an APK:
+       uses the safe-area inset when reported, with a fixed floor for
+       WebViews that report 0 but still draw under the status bar */
+    top:max(env(safe-area-inset-top,0px),34px);
     z-index:100;
     width:100%;
     max-width:var(--maxw);
@@ -1746,9 +1749,9 @@ osFUFouFYZdn3aPfYwERPNIPBRiYt981gZ/0TZBIYpIWc/fvAADA/wcMSkFdR+1/XAAAAABJRU5ErkJg
   .calc-tab.active{background:var(--orange);border-color:var(--orange);color:#fff;}
   .calc-tab-panel{display:flex;flex-direction:column;gap:12px;}
   .calc-tab-panel[hidden]{display:none!important;}
-  #shootingCalcSection,#meleeCalcSection{scroll-margin-top:54px;}
+  #shootingCalcSection,#meleeCalcSection{scroll-margin-top:84px;}
   .calc-summary{
-    position:sticky;top:0;z-index:5;
+    position:sticky;top:max(env(safe-area-inset-top,0px),34px);z-index:5;
     display:grid;grid-template-columns:repeat(3,minmax(0,1fr));
     background:var(--black);border:1px solid var(--border);border-radius:var(--r-lg);
     box-shadow:0 6px 14px rgba(0,0,0,.6);
