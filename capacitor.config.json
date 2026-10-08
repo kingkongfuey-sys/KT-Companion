@@ -1,9 +1,10 @@
 {
   "appId": "com.henryeveritt.ktcompanion",
   "appName": "KT Companion",
-  "webDir": ".",
+  "webDir": "www",
   "bundledWebRuntime": false,
   "android": {
     "allowMixedContent": true
   }
 }
+``
