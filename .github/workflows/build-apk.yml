@@ -21,21 +21,16 @@ jobs:
 
       - name: Verify Files
         run: |
-          echo "Root:"
-          ls -la
-
-          echo "WWW:"
-          ls -la www
-
-          echo "Resources:"
-          ls -la resources
-
+          test -f capacitor.config.json
+          test -f www/index.html
+          test -f resources/icon.png
           echo "Config:"
           cat capacitor.config.json
-
-      - name: Initialise Capacitor
-        run: |
-          npx cap init "KT Companion" "com.henryeveritt.ktcompanion" --web-dir=www
+          if [ -f www/native-export.bundle.js ]; then
+            echo "Native export bundle found."
+          else
+            echo "::warning::www/native-export.bundle.js is missing; native image export may not work."
+          fi
 
       - name: Add Android
         run: npx cap add android
@@ -44,7 +39,7 @@ jobs:
         run: npx capacitor-assets generate
 
       - name: Sync Android
-        run: npx cap sync
+        run: npx cap sync android
 
       - name: Setup Java
         uses: actions/setup-java@v4
