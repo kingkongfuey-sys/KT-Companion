@@ -4086,6 +4086,13 @@ html[data-astramilitarum] .dice-result.rolling{animation:diceTumAm .75s ease-in-
           </div>
         </div>
       </div>
+      <div class="kt-set-row kt-set-col" id="introDbgRow">
+        <span class="kt-set-lbl">Intro test (temporary)</span>
+        <div id="introDbgBtns" style="display:flex;flex-wrap:wrap;gap:6px">
+          <button type="button" class="idb" data-n="0">0</button><button type="button" class="idb" data-n="1">1</button><button type="button" class="idb" data-n="2">2</button><button type="button" class="idb" data-n="3">3</button><button type="button" class="idb" data-n="4">4</button><button type="button" class="idb" data-n="5">5</button><button type="button" class="idb" data-n="6">6</button><button type="button" class="idb" data-n="7">7</button>
+        </div>
+        <div id="introDbgCap" style="font-size:11px;line-height:1.35;opacity:.85">Tap a number to replay the Harlequins intro with that many layers removed.</div>
+      </div>
     </div>
     <button type="button" class="kt-ib" id="exportOpenBtn" onclick="openExportView()" title="Export a scoreboard image of all players" aria-label="Export scoreboard image"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v12m0 0-4-4m4 4 4-4"/><path d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2"/></svg></button>
   </div>
@@ -13699,7 +13706,7 @@ var inquisitionLines=["This conversation is being entered into the record.","You
     for(var q=0;q<12;q++)runes+='<i class="ktci-rune" style="--x:'+((q*31+7)%94)+'%;--y:'+((q*47+9)%86)+'%;--size:'+(16+(q%4)*8)+'px;--delay:'+((q%6)*.16)+'s;--dx:'+((q%2?1:-1)*(12+q*2))+'px">'+runeSet[(q+(key.length*3))%runeSet.length]+'</i>';
     ov.innerHTML='<div class="ktci-scene">'+particles+streaks+data+'<div class="ktci-atmo"><div class="ktci-rings"></div>'+runes+'</div><div class="ktci-scanlines"></div><div class="ktci-glitch"></div><div class="ktci-targeting" aria-hidden="true"><i></i><b></b><em></em></div><div class="ktci-edgeframe" aria-hidden="true"></div><div class="ktci-sweep" aria-hidden="true"></div></div><div class="ktci-sigil">'+d.sigil+'</div>'+ 
       '<h1 class="ktci-title">'+d.label+'</h1><span class="ktci-subtitle">'+d.subtitle+'</span>';
-    if(d.motion==='harlequin')ov.insertAdjacentHTML('afterbegin',"<div class=\"hq-stage\" aria-hidden=\"true\"><div class=\"hq-spot\"></div><div class=\"hq-lattice\"></div><div class=\"hq-tiles-clip\"><div class=\"hq-tiles\"></div></div><div class=\"hq-curtain l\"></div><div class=\"hq-curtain r\"></div><div class=\"hq-flash\"></div></div>");
+    if(d.motion==='harlequin')ov.insertAdjacentHTML('afterbegin',"<div class=\"hq-stage\" aria-hidden=\"true\"><div class=\"hq-spot\"></div><div class=\"hq-lattice\"></div><div class=\"hq-tiles\"></div><div class=\"hq-curtain l\"></div><div class=\"hq-curtain r\"></div><div class=\"hq-flash\"></div></div>");
     if(d.motion==='astramilitarum')ov.insertAdjacentHTML('afterbegin',amStageHTML());
     if(window.KTX&&KTX.has(key)){ov.insertAdjacentHTML('afterbegin',KTX.html(key));KTX.sound(key);}
     if(window.KTLOGO&&KTLOGO.has(key)){ov.classList.add('kxl-on');ov.setAttribute('data-kxl',key);ov.insertAdjacentHTML('beforeend',KTLOGO.layer(key));}
@@ -16882,13 +16889,8 @@ html,body{overflow-x:clip;max-width:100%}
   .kt-categories{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;align-items:start}
 }
 
-/* ===== Harlequins intro: WebView-friendly (same visuals) =====
-   The growing circle used to clip the huge rotated checker layer directly, which forced a full re-raster of that layer every frame
-   (very slow in Android WebView). The identical circle now clips a screen-sized wrapper instead (112.5% there = 75% on the old 1.5x box). */
-.hq-tiles-clip{position:absolute;inset:0;animation:hqTilesClip 2.6s 2.2s ease-out both}
-@keyframes hqTilesClip{0%{clip-path:circle(0 at 50% 50%)}100%{clip-path:circle(112.5% at 50% 50%)}}
-@keyframes hqTilesFade{0%{opacity:0}25%{opacity:1}100%{opacity:.8}}
-.hq-tiles{animation:hqTilesFade 2.6s 2.2s ease-out both}
+.idb{min-width:32px;height:32px;border-radius:8px;border:1px solid var(--border,#888);background:var(--panel-alt,#222);color:var(--text,#fff);font:700 13px system-ui,sans-serif;cursor:pointer}
+.idb.on{background:var(--orange,#ee6c22);color:#fff;border-color:transparent}
 </style>
 <script id="ktlogo-js">
 /* ===== KTLOGO: faction logos for the theme intros and the theme dropdown (additive) =====
@@ -16947,6 +16949,31 @@ function refresh(){try{var c=(getComputedStyle(root).getPropertyValue('--orange'
 var s='<svg xmlns="http://www.w3.org/2000/svg" viewBox="-60 -90 910 780"><rect x="-60" y="-90" width="910" height="780" fill="'+bg+'"/><g fill="'+c+'">'+svg.innerHTML+'</g></svg>';
 var i=new Image();i.onload=function(){window.ktMarkImg=i;var pi=document.querySelector('#ktPop img');if(pi)pi.src=i.src};i.src='data:image/svg+xml;charset=utf-8,'+encodeURIComponent(s);}catch(e){}}
 refresh();try{new MutationObserver(function(){clearTimeout(refresh.t);refresh.t=setTimeout(refresh,700)}).observe(root,{attributes:true})}catch(e){}})();
+</script>
+<script>
+/* TEMPORARY intro test: each number replays the Harlequins intro with MORE layers removed (cumulative). */
+(function(){
+  var st=document.createElement('style');st.id='introDbgStyle';document.head.appendChild(st);
+  var CSS=[
+    '',
+    'html[data-harlequin] body::before,html[data-harlequin] body::after,.hq-confetti{display:none!important}',
+    '.hq-tiles{display:none!important}',
+    '.hq-lattice{display:none!important}',
+    '.hq-spot,.hq-curtain,.hq-flash{display:none!important}',
+    '#ktThemeCinematic.harlequin .ktci-particle,#ktThemeCinematic.harlequin .ktci-rune,#ktThemeCinematic.harlequin .ktci-rings,#ktThemeCinematic.harlequin .ktci-sweep{display:none!important}',
+    '.kxl-harlequin .kxl-mark svg{filter:none!important}.kxl:before{display:none!important}#ktThemeCinematic.harlequin .ktci-title{filter:none!important;animation:none!important;opacity:1!important}',
+    '#ktThemeCinematic.harlequin{animation:none!important;isolation:auto!important}'
+  ];
+  var CAP=['0: full intro (as it is now)','1: no page-background layers behind the intro','2: + no checker circle','3: + no flickering checker','4: + no curtains, spotlight, flash','5: + no particles, runes, rings, sweep','6: + no glow/blur on logo and title','7: + no exit diamond wipe (bare minimum)'];
+  document.addEventListener('click',function(e){
+    var b=e.target.closest&&e.target.closest('.idb');if(!b)return;
+    var n=+b.getAttribute('data-n');
+    st.textContent=CSS.slice(0,n+1).join('\n');
+    [].forEach.call(document.querySelectorAll('.idb'),function(x){x.classList.toggle('on',x===b);});
+    var cap=document.getElementById('introDbgCap');if(cap)cap.textContent=CAP[n];
+    if(window.ktApplyTheme){ktApplyTheme('none');setTimeout(function(){ktApplyTheme('harlequin');},450);}
+  });
+})();
 </script>
 </body>
 </html>
