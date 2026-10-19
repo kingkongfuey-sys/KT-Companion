@@ -13707,6 +13707,7 @@ var inquisitionLines=["This conversation is being entered into the record.","You
     ov.innerHTML='<div class="ktci-scene">'+particles+streaks+data+'<div class="ktci-atmo"><div class="ktci-rings"></div>'+runes+'</div><div class="ktci-scanlines"></div><div class="ktci-glitch"></div><div class="ktci-targeting" aria-hidden="true"><i></i><b></b><em></em></div><div class="ktci-edgeframe" aria-hidden="true"></div><div class="ktci-sweep" aria-hidden="true"></div></div><div class="ktci-sigil">'+d.sigil+'</div>'+ 
       '<h1 class="ktci-title">'+d.label+'</h1><span class="ktci-subtitle">'+d.subtitle+'</span>';
     if(d.motion==='harlequin')ov.insertAdjacentHTML('afterbegin',"<div class=\"hq-stage\" aria-hidden=\"true\"><div class=\"hq-spot\"></div><div class=\"hq-lattice\"></div><div class=\"hq-tiles\"></div><div class=\"hq-curtain l\"></div><div class=\"hq-curtain r\"></div><div class=\"hq-flash\"></div></div>");
+    if(d.motion==='harlequin'&&window.__hqCanvas){try{window.hqPaintCanvases(ov);}catch(e){}}
     if(d.motion==='astramilitarum')ov.insertAdjacentHTML('afterbegin',amStageHTML());
     if(window.KTX&&KTX.has(key)){ov.insertAdjacentHTML('afterbegin',KTX.html(key));KTX.sound(key);}
     if(window.KTLOGO&&KTLOGO.has(key)){ov.classList.add('kxl-on');ov.setAttribute('data-kxl',key);ov.insertAdjacentHTML('beforeend',KTLOGO.layer(key));}
@@ -16891,6 +16892,12 @@ html,body{overflow-x:clip;max-width:100%}
 
 .idb{min-width:32px;height:32px;border-radius:8px;border:1px solid var(--border,#888);background:var(--panel-alt,#222);color:var(--text,#fff);font:700 13px system-ui,sans-serif;cursor:pointer}
 .idb.on{background:var(--orange,#ee6c22);color:#fff;border-color:transparent}
+
+/* Harlequins intro, cheap checker layers: pattern is painted once into a small canvas instead of a huge rotated gradient layer */
+#ktThemeCinematic.hq-cv .hq-lattice{inset:0;transform:none;background:none}
+#ktThemeCinematic.hq-cv .hq-tiles{inset:0;transform:none;background:none;-webkit-mask-image:none;mask-image:none;animation-name:hqTilesC}
+#ktThemeCinematic.hq-cv .hq-lattice>canvas,#ktThemeCinematic.hq-cv .hq-tiles>canvas{position:absolute;left:0;top:0;width:100%;height:100%;display:block}
+@keyframes hqTilesC{0%{opacity:0;clip-path:circle(0 at 50% 50%)}25%{opacity:1}100%{opacity:.8;clip-path:circle(112.5% at 50% 50%)}}
 </style>
 <script id="ktlogo-js">
 /* ===== KTLOGO: faction logos for the theme intros and the theme dropdown (additive) =====
@@ -16973,6 +16980,49 @@ refresh();try{new MutationObserver(function(){clearTimeout(refresh.t);refresh.t=
     var cap=document.getElementById('introDbgCap');if(cap)cap.textContent=CAP[n];
     if(window.ktApplyTheme){ktApplyTheme('none');setTimeout(function(){ktApplyTheme('harlequin');},450);}
   });
+})();
+</script>
+<script>
+window.hqPaintCanvases=function(ov){
+  var lat=ov.querySelector('.hq-lattice'),til=ov.querySelector('.hq-tiles');if(!lat||!til)return;
+  var W=window.innerWidth,H=window.innerHeight,k=Math.min(window.devicePixelRatio||1,1.5);
+  function canvas(w,h){var c=document.createElement('canvas');c.width=Math.max(1,Math.round(w*k));c.height=Math.max(1,Math.round(h*k));var x=c.getContext('2d');if(!x)throw 0;x.scale(k,k);return [c,x];}
+  /* lattice: 1.4x box rotated 45deg, 76px checker, faint ivory */
+  var L=canvas(W,H),lx=L[1];
+  lx.translate(W/2,H/2);lx.rotate(Math.PI/4);lx.translate(-0.7*W,-0.7*H);
+  lx.fillStyle='rgba(243,239,228,0.09)';
+  var s=38,cw=1.4*W,ch=1.4*H,i,j;
+  for(i=0;i*s<cw;i++)for(j=0;j*s<ch;j++){if((i+j)&1)lx.fillRect(i*s,j*s,Math.min(s,cw-i*s),Math.min(s,ch-j*s));}
+  /* tiles: 1.5x box rotated 45deg, 120px blue/red checker, faded by a radial mask */
+  var bw=1.5*W,bh=1.5*H,O=canvas(bw,bh),ox=O[1],t=60;
+  for(i=0;i*t<bw;i++)for(j=0;j*t<bh;j++){ox.fillStyle=((i+j)&1)?'rgba(79,125,255,0.34)':'rgba(224,57,77,0.2)';ox.fillRect(i*t,j*t,Math.min(t,bw-i*t),Math.min(t,bh-j*t));}
+  var T=canvas(W,H),tx=T[1];
+  tx.imageSmoothingEnabled=true;tx.imageSmoothingQuality='high';
+  tx.save();tx.translate(W/2,H/2);tx.rotate(Math.PI/4);tx.drawImage(O[0],-bw/2,-bh/2,bw,bh);tx.restore();
+  tx.globalCompositeOperation='destination-in';
+  var R=0.75*Math.sqrt(W*W+H*H),g=tx.createRadialGradient(W/2,H/2,0,W/2,H/2,R);
+  g.addColorStop(0.30,'rgba(0,0,0,1)');g.addColorStop(0.72,'rgba(0,0,0,0)');
+  tx.fillStyle=g;tx.fillRect(0,0,W,H);
+  lat.appendChild(L[0]);til.appendChild(T[0]);ov.classList.add('hq-cv');
+};
+(function(){
+  var row=document.getElementById('introDbgBtns');
+  ['8','9'].forEach(function(n){var b=document.createElement('button');b.type='button';b.className='idb';b.setAttribute('data-n',n);b.textContent=n;row.appendChild(b);});
+  var st=document.getElementById('introDbgStyle');
+  document.addEventListener('click',function(e){
+    var b=e.target.closest&&e.target.closest('.idb');if(!b)return;
+    var n=+b.getAttribute('data-n');
+    window.__hqCanvas=n>=8;
+    if(n<8)return;
+    e.stopPropagation();
+    [].forEach.call(document.querySelectorAll('.idb'),function(x){x.classList.toggle('on',x===b);});
+    if(window.ktApplyTheme){ktApplyTheme('none');setTimeout(function(){ktApplyTheme('harlequin');},450);}
+    if(n===8)st.textContent='';
+    if(n===9)st.textContent='html[data-harlequin] body::before,html[data-harlequin] body::after,.hq-confetti{display:none!important}';
+    var cap=document.getElementById('introDbgCap');
+    if(n===8)cap.textContent='8: FULL intro, checker layers redrawn cheaply (should look the same)';
+    if(n===9)cap.textContent='9: same as 8 + page-background layers hidden';
+  },true);
 })();
 </script>
 </body>
