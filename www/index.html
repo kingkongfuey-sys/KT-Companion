@@ -2248,7 +2248,7 @@ html[data-custodes] .dice-result.rolling{animation:diceCustodes .9s ease-in-out 
 @media(prefers-reduced-motion:reduce){.custodes-intro,.custodes-intro *{animation:none!important;transition:none!important}.custodes-intro:not(.static){display:none!important}}
 
 /* ===== KT skull emblem: themed vector (accent follows the active theme via --orange) ===== */
-.kt-mark{background:var(--bg);color:var(--orange);display:grid!important;place-items:center;padding:5px;box-sizing:border-box;transition:color .6s ease,background-color .6s ease}
+.kt-mark{--mk-bg:color-mix(in srgb,var(--orange) 20%,var(--panel));background:var(--mk-bg);color:var(--orange);display:grid!important;place-items:center;padding:5px;box-sizing:border-box;transition:color .6s ease,background-color .6s ease}
 .kt-mark .kt-skull-svg{width:100%;height:100%;display:block;fill:currentColor;overflow:visible;pointer-events:none}
 #kt-splash{--ic:var(--orange)}
 #kt-splash .sp-stage{width:var(--s);height:calc(var(--s)*.76)}
@@ -2266,6 +2266,7 @@ html[data-custodes] .dice-result.rolling{animation:diceCustodes .9s ease-in-out 
 
 /* sub-page titles sit to the right of the docked companion icon, like the main page */
 .kt-sub-top h1.kt-word{margin:0;font:600 clamp(19px,6.2vw,30px)/1.15 var(--serif);min-width:0;flex:0 1 auto;overflow:hidden;text-overflow:ellipsis}
+
 </style>
 <style>
 /* Dark-theme Infiltration browser: match other category cards' black surfaces,
@@ -2623,7 +2624,7 @@ button.primary,.calc-nb.is-pressed,.melee-nb.is-pressed,.calc-step button.is-pre
 #settingsBtn svg{transition:transform .45s var(--ease,ease)}
 #settingsBtn[aria-expanded="true"]{color:var(--orange-text)}
 #settingsBtn[aria-expanded="true"] svg{transform:rotate(60deg)}
-.kt-settings{position:absolute;top:calc(100% + 8px);right:0;z-index:700;width:236px;max-width:calc(100vw - 24px);box-sizing:border-box;padding:12px 14px 14px;background:var(--panel);color:var(--text);border:1px solid var(--border);border-radius:14px;box-shadow:0 12px 32px rgba(0,0,0,.35);opacity:0;visibility:hidden;pointer-events:none;transform:scale(.2) translateY(-6px);transform-origin:var(--ox,85%) 0;transition:transform .26s cubic-bezier(.2,.9,.3,1.15),opacity .18s ease,visibility 0s linear .26s}
+.kt-settings{position:absolute;top:calc(100% + 8px);right:0;z-index:700;width:292px;max-width:calc(100vw - 24px);box-sizing:border-box;padding:12px 14px 14px;background:var(--panel);color:var(--text);border:1px solid var(--border);border-radius:14px;box-shadow:0 12px 32px rgba(0,0,0,.35);opacity:0;visibility:hidden;pointer-events:none;transform:scale(.2) translateY(-6px);transform-origin:var(--ox,85%) 0;transition:transform .26s cubic-bezier(.2,.9,.3,1.15),opacity .18s ease,visibility 0s linear .26s}
 .kt-settings.open{opacity:1;visibility:visible;pointer-events:auto;transform:none;transition:transform .26s cubic-bezier(.2,.9,.3,1.15),opacity .18s ease,visibility 0s}
 .kt-set-title{font:600 13px/1 var(--font-display,var(--serif,Georgia,serif));letter-spacing:.06em;text-transform:uppercase;color:var(--text-dim);margin:0 0 6px}
 .kt-set-row{display:flex;align-items:center;justify-content:space-between;gap:12px;min-height:44px}
@@ -3448,7 +3449,7 @@ html[data-theme="light"][data-votann] body::after{background:linear-gradient(90d
 
 /* top chips: share the row equally so all three fit on a phone without scrolling */
 .kt-nav{gap:6px;overflow:visible}
-.kt-chip{flex:1 1 0;min-width:0;justify-content:center;padding:0 6px;gap:6px;font-size:var(--fs-sm);white-space:nowrap}
+.kt-chip{flex:1 1 auto;min-width:0;justify-content:center;padding:0 10px;gap:6px;font-size:var(--fs-sm);white-space:nowrap}
 .kt-chip svg{width:18px;height:18px;flex:none}
 @media(max-width:350px){.kt-chip{font-size:12px;gap:4px;padding:0 4px}.kt-chip svg{display:none}}
 /* maps randomiser */
@@ -4090,7 +4091,7 @@ html[data-astramilitarum] .dice-result.rolling{animation:diceTumAm .75s ease-in-
   </div>
 </header>
 <nav class="kt-nav" aria-label="Tools">
-  <button type="button" class="kt-chip" id="calcOpenBtn" onclick="openCalcView()" title="Shooting damage calculator"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="3.5"/><path d="M12 1.5v4M12 18.5v4M1.5 12h4M18.5 12h4"/></svg>Damage calc</button>
+  <button type="button" class="kt-chip" id="calcOpenBtn" onclick="openCalcView()" title="Shooting damage calculator"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="3.5"/><path d="M12 1.5v4M12 18.5v4M1.5 12h4M18.5 12h4"/></svg>Damage Calc</button>
   <button type="button" class="kt-chip" onclick="openKillTeamsView()" title="Browse and randomize Kill Teams"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20a6.5 6.5 0 0 1 13 0"/><circle cx="17.5" cy="9" r="2.5"/><path d="M17 14.5a5 5 0 0 1 4.5 5"/></svg>Kill teams</button>
   <button type="button" class="kt-chip" onclick="openMapsView()" title="Terrain map layouts"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 6l6-2 6 2 6-2v14l-6 2-6-2-6 2z"/><path d="M9 4v14M15 6v14"/></svg>Maps</button>
 </nav>
@@ -4339,9 +4340,9 @@ html[data-astramilitarum] .dice-result.rolling{animation:diceTumAm .75s ease-in-
     <div class="calc-sub">Modifiers (+/-1 steps)</div>
     <div class="calc-grid">
       <div class="calc-step" data-step="modAtk"><span class="lbl">Attacks</span><button type="button" data-d="-1">-</button><span class="val">0</span><button type="button" data-d="1">+</button></div>
-      <div class="calc-step" data-step="modHit"><span class="lbl">Improve Hit</span><button type="button" data-d="-1">-</button><span class="val">0</span><button type="button" data-d="1">+</button></div>
-      <div class="calc-step" data-step="modN"><span class="lbl">Normal dmg</span><button type="button" data-d="-1">-</button><span class="val">0</span><button type="button" data-d="1">+</button></div>
-      <div class="calc-step" data-step="modC"><span class="lbl">Crit dmg</span><button type="button" data-d="-1">-</button><span class="val">0</span><button type="button" data-d="1">+</button></div>
+      <div class="calc-step" data-step="modHit"><span class="lbl">Improve hit</span><button type="button" data-d="-1">-</button><span class="val">0</span><button type="button" data-d="1">+</button></div>
+      <div class="calc-step" data-step="modN"><span class="lbl">Normal damage</span><button type="button" data-d="-1">-</button><span class="val">0</span><button type="button" data-d="1">+</button></div>
+      <div class="calc-step" data-step="modC"><span class="lbl">Critical damage</span><button type="button" data-d="-1">-</button><span class="val">0</span><button type="button" data-d="1">+</button></div>
     </div>
 
     <div class="calc-sub">Shooter height</div>
@@ -4353,7 +4354,7 @@ html[data-astramilitarum] .dice-result.rolling{animation:diceTumAm .75s ease-in-
       <label class="calc-field"><span>Accurate x</span><div class="calc-num"><button type="button" class="calc-nb" data-d="-1" aria-label="Decrease Accurate">-</button><span class="calc-display" data-calc="accurate">None</span><button type="button" class="calc-nb" data-d="1" aria-label="Increase Accurate">+</button></div></label>
       <label class="calc-field"><span>Devastating x</span><div class="calc-num"><button type="button" class="calc-nb" data-d="-1" aria-label="Decrease Devastating">-</button><span class="calc-display" data-calc="devastating">None</span><button type="button" class="calc-nb" data-d="1" aria-label="Increase Devastating">+</button></div></label>
       <label class="calc-field"><span>Piercing x</span><div class="calc-num"><button type="button" class="calc-nb" data-d="-1" aria-label="Decrease Piercing">-</button><span class="calc-display" data-calc="piercing">None</span><button type="button" class="calc-nb" data-d="1" aria-label="Increase Piercing">+</button></div></label>
-      <label class="calc-field"><span>Piercing Crits x</span><div class="calc-num"><button type="button" class="calc-nb" data-d="-1" aria-label="Decrease Piercing Crits">-</button><span class="calc-display" data-calc="piercingCrits">None</span><button type="button" class="calc-nb" data-d="1" aria-label="Increase Piercing Crits">+</button></div></label>
+      <label class="calc-field"><span>Piercing crits x</span><div class="calc-num"><button type="button" class="calc-nb" data-d="-1" aria-label="Decrease Piercing Crits">-</button><span class="calc-display" data-calc="piercingCrits">None</span><button type="button" class="calc-nb" data-d="1" aria-label="Increase Piercing Crits">+</button></div></label>
       <label class="calc-field"><span>Lethal x+</span><div class="calc-num"><button type="button" class="calc-nb" data-d="-1" aria-label="Decrease Lethal">-</button><span class="calc-display" data-calc="lethal">None</span><button type="button" class="calc-nb" data-d="1" aria-label="Increase Lethal">+</button></div></label>
     </div>
     <div class="calc-checks">
@@ -4383,9 +4384,9 @@ html[data-astramilitarum] .dice-result.rolling{animation:diceTumAm .75s ease-in-
 
     <div class="calc-sub">Modifiers (+/-1 steps)</div>
     <div class="calc-grid">
-      <div class="calc-step" data-step="modSave"><span class="lbl">Improve Save</span><button type="button" data-d="-1">-</button><span class="val">0</span><button type="button" data-d="1">+</button></div>
-      <div class="calc-step" data-step="takeN"><span class="lbl">Normal dmg taken</span><button type="button" data-d="-1">-</button><span class="val">0</span><button type="button" data-d="1">+</button></div>
-      <div class="calc-step" data-step="takeC"><span class="lbl">Crit dmg taken</span><button type="button" data-d="-1">-</button><span class="val">0</span><button type="button" data-d="1">+</button></div>
+      <div class="calc-step" data-step="modSave"><span class="lbl">Improve save</span><button type="button" data-d="-1">-</button><span class="val">0</span><button type="button" data-d="1">+</button></div>
+      <div class="calc-step" data-step="takeN"><span class="lbl">Normal damage taken</span><button type="button" data-d="-1">-</button><span class="val">0</span><button type="button" data-d="1">+</button></div>
+      <div class="calc-step" data-step="takeC"><span class="lbl">Critical damage taken</span><button type="button" data-d="-1">-</button><span class="val">0</span><button type="button" data-d="1">+</button></div>
     </div>
   </div>
 
@@ -4419,7 +4420,7 @@ html[data-astramilitarum] .dice-result.rolling{animation:diceTumAm .75s ease-in-
 
   <div class="calc-tab-panel" id="meleeTabPanel" role="tabpanel" aria-labelledby="meleeTab" hidden>
   <div class="dice-panel melee-panel" id="meleeCalcSection">
-    <div class="dice-panel-title">Melee Damage Calculator / Fight action</div>
+    <div class="dice-panel-title">Melee damage calculator / Fight action</div>
     <div class="calc-hint">Both operatives roll their melee attacks, then the attacker and defender alternate resolving successes. Each success can Strike or Block an opponent's unresolved success.</div>
 
     <div class="calc-sub">Attacking operative</div>
@@ -4432,7 +4433,7 @@ html[data-astramilitarum] .dice-result.rolling{animation:diceTumAm .75s ease-in-
     <div class="calc-sub">Attacker weapon rules</div>
     <div class="calc-grid">
       <label class="calc-field"><span>Lethal x+</span><div class="calc-num"><button type="button" class="melee-nb" data-mk="aLethal" data-d="-1">-</button><span class="calc-display" data-mcalc="aLethal">None</span><button type="button" class="melee-nb" data-mk="aLethal" data-d="1">+</button></div></label>
-      <div class="calc-step melee-mod" data-mstep="aHitMod"><span class="lbl">Hit Stat Modifier</span><button type="button" data-d="-1">-</button><span class="val">0</span><button type="button" data-d="1">+</button></div>
+      <div class="calc-step melee-mod" data-mstep="aHitMod"><span class="lbl">Hit stat modifier</span><button type="button" data-d="-1">-</button><span class="val">0</span><button type="button" data-d="1">+</button></div>
     </div>
     <div class="calc-checks">
       <label class="calc-check"><input type="checkbox" data-mcalc="aBalanced"> Balanced</label>
@@ -4458,7 +4459,7 @@ html[data-astramilitarum] .dice-result.rolling{animation:diceTumAm .75s ease-in-
     <div class="calc-sub">Defender weapon rules</div>
     <div class="calc-grid">
       <label class="calc-field"><span>Lethal x+</span><div class="calc-num"><button type="button" class="melee-nb" data-mk="dLethal" data-d="-1">-</button><span class="calc-display" data-mcalc="dLethal">None</span><button type="button" class="melee-nb" data-mk="dLethal" data-d="1">+</button></div></label>
-      <div class="calc-step melee-mod" data-mstep="dHitMod"><span class="lbl">Hit Stat Modifier</span><button type="button" data-d="-1">-</button><span class="val">0</span><button type="button" data-d="1">+</button></div>
+      <div class="calc-step melee-mod" data-mstep="dHitMod"><span class="lbl">Hit stat modifier</span><button type="button" data-d="-1">-</button><span class="val">0</span><button type="button" data-d="1">+</button></div>
     </div>
     <div class="calc-checks">
       <label class="calc-check"><input type="checkbox" data-mcalc="dBalanced"> Balanced</label>
@@ -6160,7 +6161,7 @@ const TAC_OP_CARDS_DATA = [
       {type:'heading', text:'Reveal'},
       {type:'para', text:'The first time you score VP from this op.'},
       {type:'heading', text:'Additional Rules'},
-      {type:'para', text:"An enemy operative is being tracked if it's a valid target for a friendly operative within 6\" of it. That friendly operative must have a Conceal order, cannot be a valid target for the enemy operative it's attempting to track, and cannot within control range of enemy operatives."},
+      {type:'para', text:"An enemy operative is being tracked if it's a valid target for a friendly operative within 6\" of it. That friendly operative must have a Conceal order, cannot be a valid target for the enemy operative it's attempting to track, and cannot be within control range of enemy operatives."},
       {type:'heading', text:'Victory Points'},
       {type:'para', text:'At the end of each turning point after the first:'},
       {type:'vp', items:[
@@ -9112,7 +9113,7 @@ function ktCalc(cfg) {
     bar.dataset.mode=mode;
     const avg=$('calcAvg'), max=$('calcMax'), kill=$('calcKill');
     const cells=bar.querySelectorAll('.calc-sum-lbl');
-    if(cells.length>=3){ cells[0].textContent=melee?'Melee average':'Shooting average'; cells[1].textContent=melee?'Melee max':'Shooting max'; cells[2].textContent='Chance to kill'; }
+    if(cells.length>=3){ cells[0].textContent='Average'; cells[1].textContent='Max'; cells[2].textContent='Chance to kill'; }
     if(melee){
       if(avg) avg.textContent=$('meleeAvg')?.textContent||'-';
       if(max) max.textContent=$('meleeMax')?.textContent||'-';
@@ -14727,7 +14728,7 @@ document.addEventListener('pointerdown',function(e){
 <!-- ===== Effects setting + themed skull pop-down ===== -->
 <style id="faction-pop-css">
 .kt-seg3{display:inline-flex;border:1px solid var(--border);border-radius:999px;overflow:hidden;flex:none}
-.kt-seg3 button{all:unset;box-sizing:border-box;height:26px;padding:0 8px;font:600 11.5px/26px var(--font,system-ui,sans-serif);color:var(--text-dim);cursor:pointer;-webkit-tap-highlight-color:transparent}
+.kt-seg3 button{all:unset;box-sizing:border-box;height:26px;padding:0 7px;font:600 11.5px/26px var(--font,system-ui,sans-serif);color:var(--text-dim);cursor:pointer;-webkit-tap-highlight-color:transparent}
 .kt-seg3 button+button{border-left:1px solid var(--border)}
 .kt-seg3 button[aria-checked="true"]{background:var(--orange);color:var(--on-fill)}
 html[data-fx="off"] #fxLayer,html[data-fx="off"] :is(#ktEmbers,#ktSpores,#ktMotes,#ktCandles,#ktScarabs,#ktWisps,#ktWaaagh,#ktSwarm,#ktSparkles,#ktFlames,#ktRunes,#ktFeathers,#ktGlyphs,#ktSouls,#ktGlints,#ktHalos){display:none!important}
@@ -15682,7 +15683,7 @@ var pop=document.createElement('div'),mk=document.getElementById('ktMark'),hdr=d
 pop.id='ktPop';pop.setAttribute('role','status');pop.setAttribute('aria-live','polite');
 pop.innerHTML='<img alt="" width="40" height="40"><span class="pt"><i></i></span>';
 var pt=pop.querySelector('.pt'),pi=pt.firstChild;
-if(mk)pop.firstChild.src=mk.src;else pop.firstChild.style.display='none';
+if(!mk)pop.firstChild.style.display='none';
 document.body.appendChild(pop);
 function hide(now){
   if(!pop||!pt)return;
@@ -16809,6 +16810,77 @@ if(!(K.MM2&&K.MM2.custodes))put('MM2','custodes',CUS.MM2);
 @keyframes kxlRing{0%{opacity:.85;transform:translate(-50%,-50%) scale(.45)}100%{opacity:0;transform:translate(-50%,-50%) scale(2.3)}}
 @keyframes kxlScan{0%{opacity:1;top:0}100%{opacity:0;top:100%}}
 @media(prefers-reduced-motion:reduce){.kxl,.kxl *,.kxl:before{animation:none!important}.kxl:before{opacity:1}.kxl-mark{opacity:1!important;transform:none!important;clip-path:none!important}.kxl-fx,.kxl-scan{display:none}}
+
+/* theme dropdown: show each faction logo whole (the old shape clip-paths were cropping the masked logos) */
+.kt-dd-btn:not([data-value="none"]) .kt-dd-swatch,.kt-dd-opt:not([data-value="none"]) .kt-dd-swatch{clip-path:none!important}
+.kt-dd-btn[data-value="harlequin"] .kt-dd-swatch,.kt-dd-opt[data-value="harlequin"] .kt-dd-swatch{transform:none!important;background:linear-gradient(135deg,#4f7dff 0 50%,#e0394d 50%)!important;border-radius:0}
+.kt-dd-opt[data-value="harlequin"]:hover .kt-dd-swatch,.kt-dd-opt[data-value="harlequin"]:focus-visible .kt-dd-swatch{transform:scale(1.15)!important}
+.kt-dd-btn[data-value="none"] .kt-dd-swatch,.kt-dd-opt[data-value="none"] .kt-dd-swatch{width:26px!important;height:18px!important;border:0!important;border-radius:0!important;background:radial-gradient(circle at 50% 50%,transparent 5.6px,var(--dd-c) 6px 8.4px,transparent 8.8px)!important;filter:none!important}
+
+/* calc notes dropdowns: match Reference panel chevron style */
+.calc-notes{background:var(--panel);border:1px solid var(--border);border-radius:14px;padding:0 14px;margin-top:12px}
+.calc-notes summary{list-style:none;display:flex;align-items:center;justify-content:space-between;gap:8px;min-height:44px;cursor:pointer}
+.calc-notes summary::-webkit-details-marker{display:none}
+.calc-notes summary::marker{content:""}
+.calc-notes summary::after{content:"\25BE";font-size:16px;color:var(--text-dim);transform:rotate(-90deg);transition:transform .2s ease}
+.calc-notes[open] summary::after{transform:none}
+.calc-notes[open]{padding-bottom:10px}
+@media (prefers-reduced-motion:reduce){.calc-notes summary::after{transition:none}}
+
+/* no sideways scrolling on any screen size */
+html,body{overflow-x:clip;max-width:100%}
+/* round-score steppers: value on top, big - / + buttons below (same width, a little taller) */
+.player-card .stepper{display:grid!important;grid-template-columns:1fr 1fr!important;grid-template-areas:"val val" "minus plus";gap:4px!important;width:100%;padding:0 4px!important;box-sizing:border-box}
+.player-card .stepper .round-input{grid-area:val;width:100%!important;height:26px!important;min-width:0;font-size:18px!important;font-weight:700;text-align:center}
+.player-card .stepper .step-btn:first-child{grid-area:minus}
+.player-card .stepper .step-btn:last-child{grid-area:plus}
+.player-card .stepper .step-btn{width:100%!important;min-width:0!important;height:36px!important;min-height:36px!important;font-size:18px!important}
+
+/* calc summary cards: keep labels on one line so values line up on narrow phones */
+.calc-sum-cell{display:flex;flex-direction:column;justify-content:space-between;align-items:center}
+.calc-sum-lbl{white-space:nowrap}
+@media (max-width:360px){.calc-sum-lbl{font-size:10px!important;letter-spacing:0!important}}
+
+/* ===== Laptop / desktop layout (>=1000px only; phone layout untouched) ===== */
+@media (min-width:1000px){
+  :root{--maxw:1240px}
+  #mainView{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));column-gap:16px;row-gap:14px;max-width:1240px;width:100%;align-items:start;align-self:center}
+  #mainView>*{max-width:none!important;width:auto!important;grid-column:1/-1;min-width:0}
+  #mainView>.dice-panel{grid-column:1}
+  #mainView>.game-info{grid-column:2}
+  #mainView .ref-panels-wrap{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;align-items:start}
+  #mainView .players-wrap{flex-direction:row;flex-wrap:wrap;align-items:flex-start;gap:16px}
+  #mainView .players-wrap>.player-card{flex:1 1 calc(50% - 8px);min-width:0}
+  #mainView>.finalise-score-wrap{justify-self:center;order:6}
+  #mainView>#refPanelsWrap{order:2}
+  #mainView>#killOpRefPanelsWrap{order:3;grid-template-columns:minmax(0,1fr)}
+  #mainView>#critOpPanel{order:4}
+  #mainView>#tableWrap{order:5}
+}
+
+/* laptop: calculator + kill teams use the extra width */
+@media (min-width:1000px){
+  #shootingTabPanel:not([hidden]){display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;align-items:start}
+  #shootingTabPanel>:nth-child(1){grid-column:1;grid-row:1/span 2}
+  #shootingTabPanel>:nth-child(2){grid-column:2;grid-row:1}
+  #shootingTabPanel>:nth-child(3){grid-column:2;grid-row:2}
+  #meleeCalcSection{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));column-gap:28px;align-items:start}
+  #meleeCalcSection>:nth-child(-n+2){grid-column:1/-1}
+  #meleeCalcSection>:nth-child(n+15){grid-column:1/-1}
+  #meleeCalcSection>:nth-child(3){grid-column:1;grid-row:3}
+  #meleeCalcSection>:nth-child(9){grid-column:2;grid-row:3}
+  #meleeCalcSection>:nth-child(4){grid-column:1;grid-row:4}
+  #meleeCalcSection>:nth-child(10){grid-column:2;grid-row:4}
+  #meleeCalcSection>:nth-child(5){grid-column:1;grid-row:5}
+  #meleeCalcSection>:nth-child(11){grid-column:2;grid-row:5}
+  #meleeCalcSection>:nth-child(6){grid-column:1;grid-row:6}
+  #meleeCalcSection>:nth-child(12){grid-column:2;grid-row:6}
+  #meleeCalcSection>:nth-child(7){grid-column:1;grid-row:7}
+  #meleeCalcSection>:nth-child(13){grid-column:2;grid-row:7}
+  #meleeCalcSection>:nth-child(8){grid-column:1;grid-row:8}
+  #meleeCalcSection>:nth-child(14){grid-column:2;grid-row:8}
+  .kt-categories{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;align-items:start}
+}
 </style>
 <script id="ktlogo-js">
 /* ===== KTLOGO: faction logos for the theme intros and the theme dropdown (additive) =====
@@ -16863,9 +16935,9 @@ if(!(K.MM2&&K.MM2.custodes))put('MM2','custodes',CUS.MM2);
 <script>
 /* rasterised copy of the themed skull for canvas exports (refreshes when the theme changes) */
 (function(){var root=document.documentElement,svg=document.querySelector('#ktMark svg');if(!svg)return;
-function refresh(){try{var c=(getComputedStyle(root).getPropertyValue('--orange')||'#EE6C22').trim(),bg=(getComputedStyle(root).getPropertyValue('--bg')||'#14181d').trim();
+function refresh(){try{var c=(getComputedStyle(root).getPropertyValue('--orange')||'#EE6C22').trim(),bg=((svg.parentNode&&getComputedStyle(svg.parentNode).backgroundColor)||'#14181d');
 var s='<svg xmlns="http://www.w3.org/2000/svg" viewBox="-60 -90 910 780"><rect x="-60" y="-90" width="910" height="780" fill="'+bg+'"/><g fill="'+c+'">'+svg.innerHTML+'</g></svg>';
-var i=new Image();i.onload=function(){window.ktMarkImg=i};i.src='data:image/svg+xml;charset=utf-8,'+encodeURIComponent(s);}catch(e){}}
+var i=new Image();i.onload=function(){window.ktMarkImg=i;var pi=document.querySelector('#ktPop img');if(pi)pi.src=i.src};i.src='data:image/svg+xml;charset=utf-8,'+encodeURIComponent(s);}catch(e){}}
 refresh();try{new MutationObserver(function(){clearTimeout(refresh.t);refresh.t=setTimeout(refresh,700)}).observe(root,{attributes:true})}catch(e){}})();
 </script>
 </body>
