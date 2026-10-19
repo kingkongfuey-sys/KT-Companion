@@ -13699,7 +13699,7 @@ var inquisitionLines=["This conversation is being entered into the record.","You
     for(var q=0;q<12;q++)runes+='<i class="ktci-rune" style="--x:'+((q*31+7)%94)+'%;--y:'+((q*47+9)%86)+'%;--size:'+(16+(q%4)*8)+'px;--delay:'+((q%6)*.16)+'s;--dx:'+((q%2?1:-1)*(12+q*2))+'px">'+runeSet[(q+(key.length*3))%runeSet.length]+'</i>';
     ov.innerHTML='<div class="ktci-scene">'+particles+streaks+data+'<div class="ktci-atmo"><div class="ktci-rings"></div>'+runes+'</div><div class="ktci-scanlines"></div><div class="ktci-glitch"></div><div class="ktci-targeting" aria-hidden="true"><i></i><b></b><em></em></div><div class="ktci-edgeframe" aria-hidden="true"></div><div class="ktci-sweep" aria-hidden="true"></div></div><div class="ktci-sigil">'+d.sigil+'</div>'+ 
       '<h1 class="ktci-title">'+d.label+'</h1><span class="ktci-subtitle">'+d.subtitle+'</span>';
-    if(d.motion==='harlequin')ov.insertAdjacentHTML('afterbegin',"<div class=\"hq-stage\" aria-hidden=\"true\"><div class=\"hq-spot\"></div><div class=\"hq-lattice\"></div><div class=\"hq-tiles\"></div><div class=\"hq-curtain l\"></div><div class=\"hq-curtain r\"></div><div class=\"hq-flash\"></div></div>");
+    if(d.motion==='harlequin')ov.insertAdjacentHTML('afterbegin',"<div class=\"hq-stage\" aria-hidden=\"true\"><div class=\"hq-spot\"></div><div class=\"hq-lattice\"></div><div class=\"hq-tiles-clip\"><div class=\"hq-tiles\"></div></div><div class=\"hq-curtain l\"></div><div class=\"hq-curtain r\"></div><div class=\"hq-flash\"></div></div>");
     if(d.motion==='astramilitarum')ov.insertAdjacentHTML('afterbegin',amStageHTML());
     if(window.KTX&&KTX.has(key)){ov.insertAdjacentHTML('afterbegin',KTX.html(key));KTX.sound(key);}
     if(window.KTLOGO&&KTLOGO.has(key)){ov.classList.add('kxl-on');ov.setAttribute('data-kxl',key);ov.insertAdjacentHTML('beforeend',KTLOGO.layer(key));}
@@ -16881,6 +16881,14 @@ html,body{overflow-x:clip;max-width:100%}
   #meleeCalcSection>:nth-child(14){grid-column:2;grid-row:8}
   .kt-categories{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;align-items:start}
 }
+
+/* ===== Harlequins intro: WebView-friendly (same visuals) =====
+   The growing circle used to clip the huge rotated checker layer directly, which forced a full re-raster of that layer every frame
+   (very slow in Android WebView). The identical circle now clips a screen-sized wrapper instead (112.5% there = 75% on the old 1.5x box). */
+.hq-tiles-clip{position:absolute;inset:0;animation:hqTilesClip 2.6s 2.2s ease-out both}
+@keyframes hqTilesClip{0%{clip-path:circle(0 at 50% 50%)}100%{clip-path:circle(112.5% at 50% 50%)}}
+@keyframes hqTilesFade{0%{opacity:0}25%{opacity:1}100%{opacity:.8}}
+.hq-tiles{animation:hqTilesFade 2.6s 2.2s ease-out both}
 </style>
 <script id="ktlogo-js">
 /* ===== KTLOGO: faction logos for the theme intros and the theme dropdown (additive) =====
