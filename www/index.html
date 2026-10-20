@@ -3894,7 +3894,6 @@ html[data-harlequin] .dice-result.rolling{animation:diceTumHq .8s cubic-bezier(.
 :is(.kt-dd-btn,.kt-dd-opt)[data-value="blood-god"]{--dd-c:#ff5b52;--dd-c2:#7a0f12}
 :is(.kt-dd-btn,.kt-dd-opt)[data-value="blood-god"] .kt-dd-swatch{clip-path:polygon(0 0,100% 12%,58% 44%,100% 60%,18% 100%,42% 56%,0 40%)}
 :is(.kt-dd-btn,.kt-dd-opt)[data-value="nurgle"]{--dd-c:#a4d24b;--dd-c2:#4a5d1a}
-:is(.kt-dd-btn,.kt-dd-opt)[data-value="nurgle"] .kt-dd-swatch{border-radius:50% 50% 50% 0;transform:rotate(-45deg)}
 :is(.kt-dd-btn,.kt-dd-opt)[data-value="tauva"]{--dd-c:#7cc4ff;--dd-c2:#2b6fb0}
 :is(.kt-dd-btn,.kt-dd-opt)[data-value="tauva"] .kt-dd-swatch{background:radial-gradient(circle,transparent 30%,var(--dd-c) 33% 58%,transparent 61%),radial-gradient(circle,var(--dd-c2),transparent 70%)}
 :is(.kt-dd-btn,.kt-dd-opt)[data-value="imperium"]{--dd-c:#f0c040;--dd-c2:#8a5a00}
@@ -4134,7 +4133,6 @@ html[data-astramilitarum] .dice-result.rolling{animation:diceTumAm .75s ease-in-
   <button type="button" class="primary" id="critOpRandomBtn" onclick="randomCritOp()" title="Pick a random Crit Op" aria-label="Random Crit Op"><span class="die" aria-hidden="true">&#127922;</span> Random</button>
   <span class="label">Kill Op:</span>
   <select id="killOpModeSelect" aria-label="Kill Op mode" onchange="setKillOpMode(this.value); toggleKillOpReferencePanels()">
-    <option value="">- Select -</option>
     <option value="elimination">Elimination Op</option>
     <option value="official">Official Kill Op</option>
   </select>
@@ -4443,6 +4441,7 @@ html[data-astramilitarum] .dice-result.rolling{animation:diceTumAm .75s ease-in-
       <label class="calc-check"><input type="checkbox" data-mcalc="aRending"> Rending</label>
       <label class="calc-check"><input type="checkbox" data-mcalc="aSevere"> Severe</label>
       <label class="calc-check"><input type="checkbox" data-mcalc="aBrutal"> Brutal</label>
+      <label class="calc-check"><input type="checkbox" data-mcalc="aShock"> Shock</label>
     </div>
     <div class="calc-checks melee-specials">
       <label class="calc-check"><input type="checkbox" data-mcalc="aDoubleStrike"> Can strike twice before the enemy resolves</label>
@@ -4469,6 +4468,7 @@ html[data-astramilitarum] .dice-result.rolling{animation:diceTumAm .75s ease-in-
       <label class="calc-check"><input type="checkbox" data-mcalc="dRending"> Rending</label>
       <label class="calc-check"><input type="checkbox" data-mcalc="dSevere"> Severe</label>
       <label class="calc-check"><input type="checkbox" data-mcalc="dBrutal"> Brutal</label>
+      <label class="calc-check"><input type="checkbox" data-mcalc="dShock"> Shock</label>
     </div>
     <div class="calc-checks melee-specials">
       <label class="calc-check"><input type="checkbox" data-mcalc="dDoubleStrike"> Can strike twice before the enemy resolves</label>
@@ -4608,7 +4608,7 @@ initTheme();
 
 let players = [];
 let nextId = 1;
-let killOpMode = ''; // '' | 'elimination' | 'official'
+let killOpMode = 'official'; // 'elimination' | 'official' (defaults to Official Kill Op for 1v1)
 let scoreFinalized = false; // blocks duplicate final-score bonuses
 let twoVTwo = false; // 2v2 Team Mode: 2 team cards, 2 kill teams per card, 12 VP op cap, Elimination Op
 
@@ -4626,11 +4626,17 @@ const KILL_GRADE_CHART = {
 };
 
 function setKillOpMode(mode){
-  if(twoVTwo) mode = 'elimination';   // 2v2 always plays Elimination Op (Multiplayer Ops)
-  killOpMode = mode;
   const sel = document.getElementById('killOpModeSelect');
+  if(twoVTwo) mode = 'elimination';   // 2v2 always plays Elimination Op (Multiplayer Ops)
+  if(mode !== 'official' && mode !== 'elimination') mode = (twoVTwo || players.length > 2) ? 'elimination' : 'official';
+  killOpMode = mode;
   if(sel && sel.value !== mode) sel.value = mode;
   players.forEach(pl => enforceOpCap(pl, 'kill'));
+  // If the game was already finalised, changing Kill Op mode changes how
+  // the stored kill entries are interpreted. Recalculate the Official Kill
+  // Op sole-highest-grade bonus immediately instead of leaving a stale bonus
+  // from the previous mode until another score edit.
+  if(scoreFinalized) recomputeKillGradeBonuses();
   renderTable();
 }
 
@@ -4649,9 +4655,9 @@ function syncKillOpModeToPlayerCount(){
    teams. Locked once any VP has been entered (same rule as add player / kill
    team selection). Kill Op is forced to Elimination Op (Multiplayer Ops). */
 function applyTwoVTwoUI(){
+  const started = anyVPScored();
   const chk = document.getElementById('twoVTwoToggle');
   if(chk){
-    const started = anyVPScored();
     chk.checked = twoVTwo;
     chk.disabled = started;
     chk.title = started ? 'Game in progress - reset to change 2v2 mode' : '';
@@ -4740,7 +4746,9 @@ function computeOfficialKillTotal(player){
 function killCapFor(player){
   if(killOpMode !== 'official') return null;
   const v = enemyTeamSizeFor(player);
-  if(!v || isNaN(v) || v <= 0) return null;
+  /* Fail closed while setup data is incomplete: in Official mode, an
+     unknown enemy team size must never disable the Kill Op cap. */
+  if(!Number.isFinite(v) || v <= 0) return 0;
   return v;
 }
 
@@ -6306,8 +6314,12 @@ function attachTacBrowserCardListeners(cardsEl){
         tacBrowserMinimized.add(key);
         panelEl.dataset.state = 'closed';
         saveState();
-        if(body) slideBody(body, false, () => { if(tacBrowserMinimized.has(key)) renderTacOpBrowser(); });
-        else renderTacOpBrowser();
+        const browserStateVersion = remoteStateVersion;
+        if(body) slideBody(body, false, () => {
+          if(browserStateVersion !== remoteStateVersion) return;
+          if(tacBrowserMinimized.has(key)) renderTacOpBrowser();
+        });
+        else if(browserStateVersion === remoteStateVersion) renderTacOpBrowser();
       } else {                                            // opening
         tacBrowserMinimized.delete(key);
         saveState();
@@ -6953,10 +6965,11 @@ function notifySetupMissing(p, wrap){
   clearTimeout(notifySetupMissing._t);
   notifySetupMissing._t = setTimeout(() => { t.hidden = true; }, 3200);
   const card = (wrap || document).querySelector('.player-card[data-player-id="' + p.id + '"]');
-  if(card){
-    const sel = {'Kill Team':'.kill-team-select','Player 1 Kill Team':'.kill-team-select[data-slot="1"]','Player 2 Kill Team':'.kill-team-select[data-slot="2"]','team size':'input[data-field="teamSize"]','Tac Op':'.tac-op-select','Primary Op':'.primary-op-select'};
-    miss.forEach(k => { const el = card.querySelector(sel[k]); if(el) playAnimClass(el,'score-invalid-anim',380); });
-  }
+  const selectors = {'Kill Team':'.kill-team-select','Player 1 Kill Team':'.kill-team-select[data-slot="1"]','Player 2 Kill Team':'.kill-team-select[data-slot="2"]','team size':'input[data-field="teamSize"]','Tac Op':'.tac-op-select','Primary Op':'.primary-op-select'};
+  miss.forEach(k => {
+    const el = card && card.querySelector(selectors[k]);
+    if(el) playAnimClass(el,'score-invalid-anim',380);
+  });
   return true;
 }
 
@@ -7093,7 +7106,7 @@ function buildPlayerCard(p){
     <div class="player-card" data-player-id="${p.id}">
       <div class="player-card-header">
         <span class="player-name" contenteditable="true" role="textbox" aria-label="${twoVTwo ? 'Team name' : 'Player name'}" data-player="${p.id}">${escapeHtml(playerDisplayName(p))}</span>
-        ${twoVTwo ? '' : `<button type="button" class="ghost-btn remove-player" data-player="${p.id}" title="Remove player">&#215;</button>`}
+        ${twoVTwo ? '' : `<button type="button" class="ghost-btn remove-player" data-player="${p.id}" title="${anyVPScored() ? 'Reset the game before removing players' : (players.length <= 2 ? 'A game requires at least 2 players' : 'Remove player')}" ${anyVPScored() || players.length <= 2 ? 'disabled aria-disabled="true"' : ''}>&#215;</button>`}
       </div>
       <div class="card-body">${body}</div>
     </div>
@@ -7105,6 +7118,8 @@ let pendingLockedOp = null;   // player id whose Tac Op card should slide in aft
 let pendingPlayerRemovalId = null;
 let pendingPlayerRemovalTimer = null;
 let pendingPlayerRemovalCountdown = null;
+// Incremented whenever a different tab's game replaces this tab's state.
+let remoteStateVersion = 0;
 
 /* ---------------- Export view (read-only 2x2 scoreboard) ----------------
    Reuses the exact same CSS classes/scoring helpers as the live player
@@ -7731,10 +7746,19 @@ function attachListeners(wrap){
       const op = inp.dataset.op;
       const r = Number(inp.dataset.round);
       if(!scoringSetupComplete(p)){ inp.value = String(Number(p.scores[op][r]) || 0); notifySetupMissing(p, wrap); return; }
-      const cleaned = inp.value.replace(/[^0-9]/g, '');
-      if(cleaned !== inp.value) inp.value = cleaned;
+      const raw = inp.value;
+      const previousValue = Number(p.scores[op][r]) || 0;
+      /* Scores are whole, non-negative VP. Reject malformed input instead of
+         stripping punctuation: '1.5' must never silently become '15', and
+         '-1' must never silently become '1'. Empty input remains a valid zero. */
+      if(raw !== '' && !/^\d+$/.test(raw)){
+        inp.value = String(previousValue);
+        playAnimClass(inp,'score-invalid-anim',380);
+        return;
+      }
+      const cleaned = raw;
       let v = Number(cleaned);
-      if(!cleaned || isNaN(v) || v < 0) v = 0;
+      if(!cleaned || !Number.isFinite(v) || v < 0) v = 0;
       v = clampOpRound(p, op, r, v);
       const before = Number(p.scores[op][r]) || 0;
       p.scores[op][r] = v;
@@ -7862,7 +7886,9 @@ function attachListeners(wrap){
 
   wrap.querySelectorAll('.remove-player').forEach(btn=>{
     btn.addEventListener('click', ()=>{
-      if(players.length <= 1) return;
+      // Removing a player mid-game changes opponent team sizes and can switch
+      // Official/Elimination Kill Op semantics. Keep roster stable after scoring.
+      if(players.length <= 2 || anyVPScored()) return;
       const playerId = Number(btn.dataset.player);
       if(pendingPlayerRemovalId !== playerId){
         if(pendingPlayerRemovalTimer) clearTimeout(pendingPlayerRemovalTimer);
@@ -7904,10 +7930,13 @@ function attachListeners(wrap){
       pendingPlayerRemovalCountdown = null;
       pendingPlayerRemovalTimer = null;
       const card = btn.closest('.player-card');
+      const removalStateVersion = remoteStateVersion;
       playAnimClass(btn,'remove-fire-anim',260);
       if(card && !prefersReducedMotion()){
         card.classList.add('player-removing');
         setTimeout(()=>{
+          // A remote restore during the exit animation invalidates this removal.
+          if(removalStateVersion !== remoteStateVersion) return;
           players = players.filter(pl => pl.id !== playerId);
           syncKillOpModeToPlayerCount();   // 1-2 players = Official, 3-4 = Elimination (also re-applies kill caps)
           renderTable();
@@ -7955,8 +7984,13 @@ function attachListeners(wrap){
         p.tacMinimized = true;
         panelEl.dataset.state = 'closed';
         saveState();
-        if(body) slideBody(body, false, () => { if(p.tacMinimized) renderTable(); });
-        else renderTable();
+        const playerPanelStateVersion = remoteStateVersion;
+        if(body) slideBody(body, false, () => {
+          if(playerPanelStateVersion !== remoteStateVersion) return;
+          const currentPlayer = players.find(pl => pl.id === p.id);
+          if(currentPlayer && currentPlayer.tacMinimized) renderTable();
+        });
+        else if(playerPanelStateVersion === remoteStateVersion) renderTable();
       } else {                                   // opening
         p.tacMinimized = false;
         if(body){                                // tapped mid-close: just reverse the slide
@@ -8169,8 +8203,68 @@ let resetConfirmArmed = false;
 let resetConfirmTimer = null;
 let finaliseConfirmArmed = false;
 let finaliseConfirmTimer = null;
+
+/* Finalisation requires each player/team to complete all setup fields shown for the active mode.
+   Team size is required when Official Kill Op is active, because that mode displays and uses it. */
+function missingFinaliseSetupFor(p){
+  const missing = [];
+  if(twoVTwo){
+    if(!p.killTeam) missing.push('Player 1 Kill Team');
+    if(!p.killTeam2) missing.push('Player 2 Kill Team');
+  } else if(!p.killTeam){
+    missing.push('Kill Team');
+  }
+  /* Official Kill Op uses team sizes to calculate enemy-kill limits and
+     Kill Grade progression, so do not allow finalisation with a missing size.
+     2v2 uses Elimination Op and intentionally does not require team sizes. */
+  if(!twoVTwo && killOpMode === 'official' && !(Number(p.teamSize) > 0)) missing.push('team size');
+  if(p.tacOp === '' || p.tacOp === null || p.tacOp === undefined) missing.push('Tac Op');
+  if(!['crit','tac','kill'].includes(p.primary)) missing.push('Primary Op');
+  return missing;
+}
+function validateSetupBeforeFinalise(){
+  const incomplete = players.map((p, i) => ({p, i, missing:missingFinaliseSetupFor(p)})).filter(x => x.missing.length);
+  if(!incomplete.length) return true;
+  finaliseConfirmArmed = false;
+  if(finaliseConfirmTimer) clearTimeout(finaliseConfirmTimer);
+  finaliseConfirmTimer = null;
+  const btn = document.getElementById('finaliseScoreBtn');
+  if(btn){
+    btn.classList.remove('confirm-armed');
+    btn.textContent = 'Finalise Score';
+    btn.setAttribute('aria-label','Finalise Score');
+  }
+  const messages = incomplete.map(({p,i,missing}) => {
+    const who = (p.name && String(p.name).trim()) || (twoVTwo ? 'Team ' + (i + 1) : 'Player ' + (i + 1));
+    const card = document.querySelector('.player-card[data-player-id="' + p.id + '"]');
+    const selectors = {'Kill Team':'.kill-team-select:not([data-slot])','Player 1 Kill Team':'.kill-team-select[data-slot="1"]','Player 2 Kill Team':'.kill-team-select[data-slot="2"]','team size':'input[data-field="teamSize"]','Tac Op':'.tac-op-select','Primary Op':'.primary-op-select'};
+    missing.forEach(label => {
+      const el = card && card.querySelector(selectors[label]);
+      if(el) playAnimClass(el,'score-invalid-anim',380);
+    });
+    return who + ': ' + missing.join(', ');
+  });
+  let toast = document.getElementById('setupToast');
+  if(!toast){
+    toast = document.createElement('div'); toast.id='setupToast'; toast.className='export-toast';
+    toast.setAttribute('role','status'); toast.setAttribute('aria-live','polite');
+    toast.style.zIndex='10001'; toast.style.width='max-content'; toast.style.maxWidth='90vw';
+    document.body.appendChild(toast);
+  }
+  toast.textContent = 'Complete setup before finalising: ' + messages.join(' | ');
+  toast.hidden = false;
+  clearTimeout(validateSetupBeforeFinalise._timer);
+  validateSetupBeforeFinalise._timer = setTimeout(()=>{toast.hidden=true;},5000);
+  const firstMissing = incomplete[0];
+  const firstCard = document.querySelector('.player-card[data-player-id="' + firstMissing.p.id + '"]');
+  const firstSelector = {'Kill Team':'.kill-team-select:not([data-slot])','Player 1 Kill Team':'.kill-team-select[data-slot="1"]','Player 2 Kill Team':'.kill-team-select[data-slot="2"]','team size':'input[data-field="teamSize"]','Tac Op':'.tac-op-select','Primary Op':'.primary-op-select'}[firstMissing.missing[0]];
+  const firstEl = firstCard && firstCard.querySelector(firstSelector);
+  if(firstEl && typeof firstEl.focus === 'function') firstEl.focus({preventScroll:true});
+  return false;
+}
 function finaliseScore(){
   if(scoreFinalized) return;
+  if(!validateSetupBeforeFinalise()) return;
   const btn = document.getElementById('finaliseScoreBtn');
 
   // Two-step confirmation prevents accidental game finalisation.
@@ -8252,6 +8346,10 @@ function resetAll(){
   if(resetConfirmTimer) clearTimeout(resetConfirmTimer);
   resetConfirmTimer = null;
   if(resetBtn){resetBtn.classList.remove('reset-confirm-armed');resetBtn.textContent='Reset';resetBtn.setAttribute('aria-label','Reset all scores');}
+  // A reset starts a distinct game session, even if its initial data matches
+  // another tab's fresh game exactly. This identity is persisted with the next save.
+  gameSessionId = createGameSessionId();
+  gameRevision = 0;
   // back to a fresh 2-player (1v1) game - 2v2 Team Mode is switched off too
   twoVTwo = false;
   players = [];
@@ -8427,7 +8525,13 @@ function updateLeader(animate){
       card.classList.remove('lead-flourish');
       void card.offsetWidth;
       card.classList.add('lead-flourish');
-      setTimeout(() => card.classList.remove('lead-flourish'), 650);
+      const leaderStateVersion = remoteStateVersion;
+      setTimeout(() => {
+        // A remote restore invalidates old leader flourishes; never mutate a
+        // detached card or apply an animation cleanup to a different game.
+        if(leaderStateVersion !== remoteStateVersion || !card.isConnected) return;
+        card.classList.remove('lead-flourish');
+      }, 650);
     }
   });
   lastLeaderId = ids.length === 1 ? ids[0] : null;
@@ -8441,6 +8545,41 @@ let saveTimer = null;
 let persistedCritOp = '';
 let applyingRemoteState = false;
 let lastSavedJson = null;
+let storageSnapshotKnown = false;
+/* Session identity distinguishes a reset/new game from an ordinary edit, even
+   when two games happen to serialize to identical player and score data. */
+function createGameSessionId(){
+  return 'game-' + Date.now().toString(36) + '-' + Math.random().toString(36).slice(2, 12);
+}
+let gameSessionId = createGameSessionId();
+let gameRevision = 0;
+let saveStatusMessage = '';
+let saveStatusTimer = null;
+let saveStatusVersion = 0;
+
+function setSaveStatus(message, isError){
+  const statusVersion = ++saveStatusVersion;
+  saveStatusMessage = message || '';
+  let el = document.getElementById('saveStatusNotice');
+  if(!saveStatusMessage){
+    if(el) el.remove();
+    if(saveStatusTimer){ clearTimeout(saveStatusTimer); saveStatusTimer = null; }
+    return;
+  }
+  if(!el){
+    el = document.createElement('div');
+    el.id = 'saveStatusNotice';
+    el.setAttribute('role', 'status');
+    el.setAttribute('aria-live', 'polite');
+    el.style.cssText = 'position:fixed;left:12px;right:12px;bottom:12px;z-index:20000;padding:12px 14px;border-radius:10px;font:600 14px/1.4 system-ui,sans-serif;box-shadow:0 4px 18px rgba(0,0,0,.28);text-align:center;';
+    document.body.appendChild(el);
+  }
+  el.textContent = saveStatusMessage;
+  el.style.background = isError ? '#7f1d1d' : '#166534';
+  el.style.color = '#fff';
+  if(saveStatusTimer){ clearTimeout(saveStatusTimer); saveStatusTimer = null; }
+  if(!isError){ saveStatusTimer = setTimeout(() => { if(statusVersion === saveStatusVersion && saveStatusMessage === message){ saveStatusTimer = null; setSaveStatus('', false); } }, 3500); }
+}
 
 /* Saved immediately (no debounce): the state is a few KB, and a delayed save
    can be lost if the browser/app is killed before the timer fires. */
@@ -8450,19 +8589,48 @@ function saveState(){
 
 function saveStateNow(){
   clearTimeout(saveTimer);
-  if(!players.length) return;
+  if(!players.length || applyingRemoteState) return;
   try{
+    /* Conflict guard: all normal edits save immediately. If storage has changed
+       since this tab's last successful write, another tab is newer; adopt that
+       state instead of overwriting it with this tab's potentially stale copy. */
+    const storedRaw = localStorage.getItem(STORAGE_KEY);
+    /* If startup could not read storage, establish a baseline before writing.
+       Never treat an unknown snapshot as permission to overwrite another tab's save. */
+    if(!storageSnapshotKnown){
+      lastSavedJson = storedRaw;
+      storageSnapshotKnown = true;
+      setSaveStatus('Save not written yet: storage was unavailable during startup. The current stored snapshot has been checked; make another change to save safely.', true);
+      return;
+    }
+    if(lastSavedJson !== storedRaw){
+      if(storedRaw) syncFromOtherTab(storedRaw);
+      else setSaveStatus('Save conflict detected: stored game data is missing. This tab has not overwritten it.', true);
+      return;
+    }
     const sel = document.getElementById('critOpSelect');
     if(!critOpSpinTimer) persistedCritOp = sel ? sel.value : '';   // ignore mid-roll values
-    if(applyingRemoteState) return;   // never write back a state we just received from another tab
+    /* Keep the monotonic revision within JavaScript's exact-integer range. A
+       malicious/hand-edited save at MAX_SAFE_INTEGER starts a fresh session. */
+    if(!Number.isSafeInteger(gameRevision) || gameRevision >= Number.MAX_SAFE_INTEGER){
+      gameSessionId = createGameSessionId();
+      gameRevision = 0;
+    }
+    const nextRevision = gameRevision + 1;
     const payload = JSON.stringify({
-      v: 2, players, nextId, killOpMode, twoVTwo, finalized: scoreFinalized, critOp: persistedCritOp, critMin: critOpMinimized,
+      v: 2, sessionId: gameSessionId, revision: nextRevision,
+      players, nextId, killOpMode, twoVTwo, finalized: scoreFinalized, critOp: persistedCritOp, critMin: critOpMinimized,
       tacCats: Array.from(tacBrowserActiveCats), tacCardMin: Array.from(tacBrowserMinimized),
       killTeams: Array.from(killTeamsActive), ownedTeams: Array.from(ownedKillTeams)
     });
-    lastSavedJson = payload;
     localStorage.setItem(STORAGE_KEY, payload);
-  }catch(e){ /* storage unavailable (private mode, sandboxed preview) - just don't save */ }
+    gameRevision = nextRevision;
+    lastSavedJson = payload; // only mark it saved after setItem succeeds
+    storageSnapshotKnown = true;
+    if(saveStatusMessage) setSaveStatus('Game saved. Automatic saving is working again.', false);
+  }catch(e){
+    setSaveStatus('Unable to save this game. Your latest changes may be lost if you close or reload this page. Free browser storage or enable site storage, then make another change to retry.', true);
+  }
 }
 
 function loadSavedState(){
@@ -8475,6 +8643,8 @@ function loadSavedState(){
 }
 
 function applySavedState(d){
+  gameSessionId = (typeof d.sessionId === 'string' && d.sessionId.length > 0 && d.sessionId.length <= 120) ? d.sessionId : createGameSessionId();
+  gameRevision = Number.isSafeInteger(d.revision) && d.revision >= 0 ? d.revision : 0;
   const OPS = ['crit','tac','kill'];
   const used = new Set();
   let maxId = 0;
@@ -8483,14 +8653,14 @@ function applySavedState(d){
     sp = sp || {};
     const p = newPlayer('');
     let id = Number(sp.id);
-    if(!Number.isInteger(id) || id < 1 || used.has(id)) id = 0;
+    if(!Number.isSafeInteger(id) || id < 1 || used.has(id)) id = 0;
     p.id = id;
     if(id){ used.add(id); maxId = Math.max(maxId, id); }
     p.name = typeof sp.name === 'string' ? cleanPlayerName(sp.name) : 'Player';
     const scores = {};
     OPS.forEach(op => {
       const arr = Array.isArray(sp.scores && sp.scores[op]) ? sp.scores[op] : [];
-      scores[op] = [0,1,2,3].map(i => Math.max(0, Math.floor(Number(arr[i])) || 0));
+      scores[op] = [0,1,2,3].map(i => { const n = Number(arr[i]); return Number.isSafeInteger(n) && n >= 0 ? n : 0; });
     });
     p.scores = scores;
     p.teamSize = sanitizeTeamSize(sp.teamSize);
@@ -8508,10 +8678,15 @@ function applySavedState(d){
     return p;
   });
   players.forEach(p => { if(!p.id) p.id = ++maxId; });
-  nextId = Math.max(Number(d.nextId) || 1, maxId + 1);
+  /* A malformed save with only one player must not leave the scorer in an
+     unsupported single-player state. Restore the normal two-player minimum. */
+  while(players.length < 2) players.push(newPlayer('Player ' + (players.length + 1)));
+  const savedNextId = Number(d.nextId);
+  const safeNextId = Number.isSafeInteger(savedNextId) && savedNextId > 0 ? savedNextId : 1;
+  nextId = Math.max(safeNextId, maxId + 1, ...players.map(p => p.id + 1));
 
-  // Older saved states predate the explicit - Select - default; don't restore their old Kill Op mode.
-  killOpMode = Number(d.v) >= 2 && (d.killOpMode === 'official' || d.killOpMode === 'elimination') ? d.killOpMode : '';
+  // Saved states without a valid Kill Op mode use the standard player-count default.
+  killOpMode = Number(d.v) >= 2 && (d.killOpMode === 'official' || d.killOpMode === 'elimination') ? d.killOpMode : ((twoVTwo || players.length > 2) ? 'elimination' : 'official');
   if(twoVTwo) killOpMode = 'elimination';
   const modeSel = document.getElementById('killOpModeSelect');
   if(modeSel) modeSel.value = killOpMode;
@@ -8549,6 +8724,11 @@ function applySavedState(d){
   }
 
   scoreFinalized = !!d.finalized;
+  // Never trust a persisted Kill Grade bonus blindly: derive it from the
+  // restored scores and active Kill Op mode so a stale/edited save cannot
+  // award the wrong player a finalisation bonus.
+  if(scoreFinalized) recomputeKillGradeBonuses();
+  else players.forEach(p => { p.killGradeBonus = false; });
   const restoredLeaderIds = findLeaderIds();
   lastLeaderId = restoredLeaderIds.length === 1 ? restoredLeaderIds[0] : null; // restoring isn't a lead change - no flourish on load
   renderTable();
@@ -8576,19 +8756,50 @@ function syncFromOtherTab(raw){
   if(!d || !Array.isArray(d.players) || !d.players.length) return;
   applyingRemoteState = true;
   try{
+    remoteStateVersion++;
     cancelCritOpSpin();
+    /* A remote game replacement invalidates pending local confirmations/actions.
+       Clear timers before rendering the incoming game so no old action can fire later. */
+    finaliseConfirmArmed = false;
+    if(finaliseConfirmTimer){ clearTimeout(finaliseConfirmTimer); finaliseConfirmTimer = null; }
+    const finaliseBtn = document.getElementById('finaliseScoreBtn');
+    if(finaliseBtn){
+      finaliseBtn.classList.remove('confirm-armed','finalise-success');
+      finaliseBtn.disabled = false;
+      finaliseBtn.textContent = 'Finalise Score';
+      finaliseBtn.setAttribute('aria-label','Finalise Score');
+    }
+    pendingPlayerRemovalId = null;
+    if(pendingPlayerRemovalTimer){ clearTimeout(pendingPlayerRemovalTimer); pendingPlayerRemovalTimer = null; }
+    if(pendingPlayerRemovalCountdown){ clearInterval(pendingPlayerRemovalCountdown); pendingPlayerRemovalCountdown = null; }
+    /* A remote game replacement invalidates any armed local reset confirmation.
+       Otherwise the next click could reset the newly restored game unexpectedly. */
+    resetConfirmArmed = false;
+    if(resetConfirmTimer){ clearTimeout(resetConfirmTimer); resetConfirmTimer = null; }
+    const resetBtn = document.getElementById('resetAllBtn');
+    if(resetBtn){
+      resetBtn.classList.remove('reset-confirm-armed','reset-arm-anim','reset-cancel-anim');
+      resetBtn.textContent = 'Reset';
+      resetBtn.setAttribute('aria-label','Reset all scores');
+    }
     applySavedState(d);
     lastSavedJson = raw;
+    storageSnapshotKnown = true;
+    /* Always explain a remote restore. In particular, reset/save conflict handling
+       can replace the local view with a newer game; do not make this notice depend
+       on an unrelated save error already being visible. */
+    setSaveStatus('A newer game was saved in another tab, so this tab has loaded that version. Your local reset or edits were not applied. Switch to the other tab or make your changes again here.', true);
   }finally{ applyingRemoteState = false; }
 }
 window.addEventListener('storage', e => {
   if(e.key === STORAGE_KEY) syncFromOtherTab(e.newValue);
 });
 
-window.addEventListener('pagehide', saveStateNow);
+/* State is persisted synchronously on edits. Lifecycle events must not write a
+   potentially stale snapshot; when the tab returns, reconcile from storage. */
+window.addEventListener('pagehide', () => {});
 document.addEventListener('visibilitychange', () => {
-  if(document.visibilityState === 'hidden') saveStateNow();
-  else {
+  if(document.visibilityState !== 'hidden') {
     // Coming back to this tab: pick up anything another tab saved while this one was hidden.
     try{ syncFromOtherTab(localStorage.getItem(STORAGE_KEY)); }catch(e){}
   }
@@ -8608,8 +8819,14 @@ document.getElementById('critOpPanel').addEventListener('click', e => {
     critOpMinimized = true;
     panel.dataset.state = 'closed';
     saveState();
-    if(body) slideBody(body, false, () => { if(critOpMinimized) renderCritOpPanel(key); });
-    else renderCritOpPanel(key);
+    const panelStateVersion = remoteStateVersion;
+    if(body) slideBody(body, false, () => {
+      /* The animation may finish after another tab has replaced the game.
+         Do not let a callback from the old panel render over the restored state. */
+      if(panelStateVersion !== remoteStateVersion) return;
+      if(critOpMinimized && document.getElementById('critOpSelect').value === key) renderCritOpPanel(key);
+    });
+    else if(document.getElementById('critOpSelect').value === key) renderCritOpPanel(key);
   } else {                                       // opening
     critOpMinimized = false;
     if(body){                                    // tapped mid-close: just reverse the slide
@@ -8623,7 +8840,14 @@ document.getElementById('critOpPanel').addEventListener('click', e => {
 });
 
 const savedGame = loadSavedState();
+/* Capture a baseline even when the save is absent or malformed. A failed read is
+   explicitly marked unknown so the first later successful write cannot blindly
+   replace data that may have changed in another tab. */
+try{ lastSavedJson = localStorage.getItem(STORAGE_KEY); storageSnapshotKnown = true; }
+catch(e){ lastSavedJson = null; storageSnapshotKnown = false; }
 if(savedGame){
+  /* Keep the exact raw representation here: applySavedState may sanitize legacy
+     metadata, which is migrated only after the conflict check succeeds. */
   applySavedState(savedGame);
 } else {
   addPlayer();
@@ -8804,9 +9028,9 @@ function ktCalc(cfg) {
   const MKEY = 'ktCompanion.meleeCalc.v1';
   const MDEFAULTS = {
     aAttacks:4,aHit:3,aN:3,aC:4,aWounds:10,aLethal:0,aHitMod:0,
-    aBalanced:false,aCeaseless:false,aRelentless:false,aPunishing:false,aRending:false,aSevere:false,aBrutal:false,aChargeSupport:false,aDoubleStrike:false,aPreBlock:false,
+    aBalanced:false,aCeaseless:false,aRelentless:false,aPunishing:false,aRending:false,aSevere:false,aBrutal:false,aShock:false,aChargeSupport:false,aDoubleStrike:false,aPreBlock:false,
     dAttacks:4,dHit:3,dN:3,dC:4,dWounds:10,dLethal:0,dHitMod:0,
-    dBalanced:false,dCeaseless:false,dRelentless:false,dPunishing:false,dRending:false,dSevere:false,dBrutal:false,dChargeSupport:false,dDoubleStrike:false,dPreBlock:false
+    dBalanced:false,dCeaseless:false,dRelentless:false,dPunishing:false,dRending:false,dSevere:false,dBrutal:false,dShock:false,dChargeSupport:false,dDoubleStrike:false,dPreBlock:false
   };
   let ms = Object.assign({}, MDEFAULTS);
   try{ const raw=localStorage.getItem(MKEY); if(raw){ const d=JSON.parse(raw); Object.keys(MDEFAULTS).forEach(k=>{ if(d && typeof d[k]===typeof MDEFAULTS[k] && (typeof d[k]!=='number'||Number.isFinite(d[k]))) ms[k]=d[k]; }); } }catch(e){}
@@ -8890,7 +9114,7 @@ function ktCalc(cfg) {
   // in two different ways: trying to survive (minimise damage received) or
   // trying to kill the attacker (maximise damage dealt back).
   function resolveFight(A,D,aW,dW,turn,aDoubleReady=false,dDoubleReady=false,defenderGoal='survive'){
-    const key=[A.n,A.c,D.n,D.c,aW,dW,turn,aDoubleReady?1:0,dDoubleReady?1:0,defenderGoal].join(',');
+    const key=[A.n,A.c,D.n,D.c,aW,dW,turn,aDoubleReady?1:0,dDoubleReady?1:0,A.shockUsed?1:0,D.shockUsed?1:0,defenderGoal].join(',');
     if(memo.has(key)) return memo.get(key);
     if(dW<=0 || (A.n+A.c===0 && D.n+D.c===0)) return {toD:0,toA:0};
     if(aW<=0) return {toD:0,toA:0};
@@ -8898,63 +9122,86 @@ function ktCalc(cfg) {
     if(turn===1 && D.n+D.c===0) return resolveFight(A,D,aW,dW,0,aDoubleReady,dDoubleReady,defenderGoal);
 
     const opts=[];
+    const shockOpponent=(own,opp,isCrit)=>{
+      if(!isCrit || !own.shock || own.shockUsed) return {own,opp};
+      const nextOwn={...own,shockUsed:true};
+      const nextOpp={...opp};
+      if(nextOpp.n>0) nextOpp.n--; else if(nextOpp.c>0) nextOpp.c--;
+      return {own:nextOwn,opp:nextOpp};
+    };
+    const strike=(own,opp,kind)=>{
+      const damage=kind==='c'?own.cD:own.nD;
+      const nextOwn={...own,[kind]:own[kind]-1};
+      const shocked=shockOpponent(nextOwn,opp,kind==='c');
+      return {own:shocked.own,opp:shocked.opp,damage};
+    };
     if(turn===0){
-      const pushStrike=(kind,dmg,nextA,nextD,remainingA,remainingD,secondUsed)=>{
-        const r=resolveFight(nextA,nextD,remainingA,remainingD,1,secondUsed?false:aDoubleReady,dDoubleReady,defenderGoal);
-        opts.push({toD:dmg+r.toD,toA:r.toA});
+      const pushSingle=(kind)=>{
+        const hit=strike(A,D,kind), applied=Math.min(hit.damage,dW);
+        if(dW-applied<=0){opts.push({toD:applied,toA:0});return;}
+        const r=resolveFight(hit.own,hit.opp,aW,dW-applied,1,false,dDoubleReady,defenderGoal);
+        opts.push({toD:applied+r.toD,toA:r.toA});
       };
-      if(A.n>0){
-        const nextA={...A,n:A.n-1};
-        if(aDoubleReady){
-          if(nextA.n>0) pushStrike('n',nextA.nD,{...nextA,n:nextA.n-1},D,aW,dW-nextA.nD,true);
-          if(nextA.c>0) pushStrike('n',nextA.cD,{...nextA,c:nextA.c-1},D,aW,dW-nextA.cD,true);
-          pushStrike('n',A.nD,nextA,D,aW,dW-A.nD,true);
-        }else pushStrike('n',A.nD,nextA,D,aW,dW-A.nD,false);
-      }
-      if(A.c>0){
-        const nextA={...A,c:A.c-1};
-        if(aDoubleReady){
-          if(nextA.n>0) pushStrike('c',nextA.nD,{...nextA,n:nextA.n-1},D,aW,dW-nextA.nD,true);
-          if(nextA.c>0) pushStrike('c',nextA.cD,{...nextA,c:nextA.c-1},D,aW,dW-nextA.cD,true);
-          pushStrike('c',A.cD,nextA,D,aW,dW-A.cD,true);
-        }else pushStrike('c',A.cD,nextA,D,aW,dW-A.cD,false);
-      }
+      const pushDouble=(firstKind)=>{
+        const first=strike(A,D,firstKind), firstApplied=Math.min(first.damage,dW);
+        if(dW-firstApplied<=0){opts.push({toD:firstApplied,toA:0});return;}
+        const secondKinds=[];
+        if(first.own.n>0) secondKinds.push('n');
+        if(first.own.c>0) secondKinds.push('c');
+        if(!secondKinds.length){
+          const r=resolveFight(first.own,first.opp,aW,dW-firstApplied,1,false,dDoubleReady,defenderGoal);
+          opts.push({toD:firstApplied+r.toD,toA:r.toA});
+          return;
+        }
+        for(const secondKind of secondKinds){
+          const second=strike(first.own,first.opp,secondKind), secondApplied=Math.min(second.damage,dW-firstApplied);
+          const dealt=firstApplied+secondApplied;
+          if(dW-dealt<=0){opts.push({toD:dealt,toA:0});continue;}
+          const r=resolveFight(second.own,second.opp,aW,dW-dealt,1,false,dDoubleReady,defenderGoal);
+          opts.push({toD:dealt+r.toD,toA:r.toA});
+        }
+      };
+      if(A.n>0){ if(aDoubleReady) pushDouble('n'); pushSingle('n'); }
+      if(A.c>0){ if(aDoubleReady) pushDouble('c'); pushSingle('c'); }
       if(A.n>0 && D.n>0 && !D.brutal){
-        const r=resolveFight({...A,n:A.n-1},{...D,n:D.n-1},aW,dW,1,aDoubleReady,dDoubleReady,defenderGoal);
-        opts.push(r);
+        const r=resolveFight({...A,n:A.n-1},{...D,n:D.n-1},aW,dW,1,false,dDoubleReady,defenderGoal); opts.push(r);
       }
-      if(A.c>0 && D.n>0){ opts.push(resolveFight({...A,c:A.c-1},{...D,n:D.n-1},aW,dW,1,aDoubleReady,dDoubleReady,defenderGoal)); }
-      if(A.c>0 && D.c>0){ opts.push(resolveFight({...A,c:A.c-1},{...D,c:D.c-1},aW,dW,1,aDoubleReady,dDoubleReady,defenderGoal)); }
-      // Attacker chooses the line that deals the most damage to the defender.
+      if(A.c>0 && D.n>0){ opts.push(resolveFight({...A,c:A.c-1},{...D,n:D.n-1},aW,dW,1,false,dDoubleReady,defenderGoal)); }
+      if(A.c>0 && D.c>0){ opts.push(resolveFight({...A,c:A.c-1},{...D,c:D.c-1},aW,dW,1,false,dDoubleReady,defenderGoal)); }
       const result=opts.length?opts.reduce((best,x)=>x.toD>best.toD?x:best,opts[0]):{toD:0,toA:0};
       memo.set(key,result); return result;
     }
 
-    if(D.n>0){
-      const nextD={...D,n:D.n-1};
-      if(dDoubleReady){
-        if(nextD.n>0){ const r=resolveFight(A,{...nextD,n:nextD.n-1},aW-D.nD,dW,0,aDoubleReady,false,defenderGoal); opts.push({toD:r.toD,toA:D.nD+r.toA}); }
-        if(nextD.c>0){ const r=resolveFight(A,{...nextD,c:nextD.c-1},aW-D.cD,dW,0,aDoubleReady,false,defenderGoal); opts.push({toD:r.toD,toA:D.cD+r.toA}); }
-        const r=resolveFight(A,nextD,aW-D.nD,dW,0,aDoubleReady,false,defenderGoal); opts.push({toD:r.toD,toA:D.nD+r.toA});
-      }else{
-        const r=resolveFight(A,nextD,aW-D.nD,dW,0,aDoubleReady,false,defenderGoal); opts.push({toD:r.toD,toA:D.nD+r.toA});
+    const pushDefenderSingle=(kind)=>{
+      const hit=strike(D,A,kind), applied=Math.min(hit.damage,aW);
+      if(aW-applied<=0){opts.push({toD:0,toA:applied});return;}
+      const r=resolveFight(hit.opp,hit.own,aW-applied,dW,0,aDoubleReady,false,defenderGoal);
+      opts.push({toD:r.toD,toA:applied+r.toA});
+    };
+    const pushDefenderDouble=(firstKind)=>{
+      const first=strike(D,A,firstKind), firstApplied=Math.min(first.damage,aW);
+      if(aW-firstApplied<=0){opts.push({toD:0,toA:firstApplied});return;}
+      const secondKinds=[];
+      if(first.own.n>0) secondKinds.push('n');
+      if(first.own.c>0) secondKinds.push('c');
+      if(!secondKinds.length){
+        const r=resolveFight(first.opp,first.own,aW-firstApplied,dW,0,aDoubleReady,false,defenderGoal);
+        opts.push({toD:r.toD,toA:firstApplied+r.toA});
+        return;
       }
-    }
-    if(D.c>0){
-      const nextD={...D,c:D.c-1};
-      if(dDoubleReady){
-        if(nextD.n>0){ const r=resolveFight(A,{...nextD,n:nextD.n-1},aW-D.cD,dW,0,aDoubleReady,false,defenderGoal); opts.push({toD:r.toD,toA:D.cD+r.toA}); }
-        if(nextD.c>0){ const r=resolveFight(A,{...nextD,c:nextD.c-1},aW-D.cD,dW,0,aDoubleReady,false,defenderGoal); opts.push({toD:r.toD,toA:D.cD+r.toA}); }
-        const r=resolveFight(A,nextD,aW-D.cD,dW,0,aDoubleReady,false,defenderGoal); opts.push({toD:r.toD,toA:D.cD+r.toA});
-      }else{
-        const r=resolveFight(A,nextD,aW-D.cD,dW,0,aDoubleReady,false,defenderGoal); opts.push({toD:r.toD,toA:D.cD+r.toA});
+      for(const secondKind of secondKinds){
+        const second=strike(first.own,first.opp,secondKind), secondApplied=Math.min(second.damage,aW-firstApplied);
+        const dealt=firstApplied+secondApplied;
+        if(aW-dealt<=0){opts.push({toD:0,toA:dealt});continue;}
+        const r=resolveFight(second.opp,second.own,aW-dealt,dW,0,aDoubleReady,false,defenderGoal);
+        opts.push({toD:r.toD,toA:dealt+r.toA});
       }
-    }
-    if(D.n>0 && A.n>0 && !A.brutal) opts.push(resolveFight({...A,n:A.n-1},{...D,n:D.n-1},aW,dW,0,aDoubleReady,dDoubleReady,defenderGoal));
-    if(D.c>0 && A.n>0) opts.push(resolveFight({...A,n:A.n-1},{...D,c:D.c-1},aW,dW,0,aDoubleReady,dDoubleReady,defenderGoal));
-    if(D.c>0 && A.c>0) opts.push(resolveFight({...A,c:A.c-1},{...D,c:D.c-1},aW,dW,0,aDoubleReady,dDoubleReady,defenderGoal));
-    // Survival: defender minimises damage received. Kill attacker: defender
-    // instead maximises damage dealt to the attacker.
+    };
+    if(D.n>0){ if(dDoubleReady) pushDefenderDouble('n'); pushDefenderSingle('n'); }
+    if(D.c>0){ if(dDoubleReady) pushDefenderDouble('c'); pushDefenderSingle('c'); }
+    if(D.n>0 && A.n>0 && !A.brutal) opts.push(resolveFight({...A,n:A.n-1},{...D,n:D.n-1},aW,dW,0,aDoubleReady,false,defenderGoal));
+    if(D.c>0 && A.n>0) opts.push(resolveFight({...A,n:A.n-1},{...D,c:D.c-1},aW,dW,0,aDoubleReady,false,defenderGoal));
+    if(D.c>0 && A.c>0) opts.push(resolveFight({...A,c:A.c-1},{...D,c:D.c-1},aW,dW,0,aDoubleReady,false,defenderGoal));
     const result=opts.length ? opts.reduce((best,x)=>{
       const better=defenderGoal==='survive' ? x.toD<best.toD : x.toA>best.toA;
       return better?x:best;
@@ -8980,8 +9227,8 @@ function ktCalc(cfg) {
       let an=Math.floor(ka/100),ac=ka%100,dn=Math.floor(kd/100),dc=kd%100;
       let dmg=0;
       if(dw>0 && aw>0){
-        const baseA={n:an,c:ac,nD:aKey.n,cD:aKey.c,brutal:aKey.brutal};
-        const baseD={n:dn,c:dc,nD:dKey.n,cD:dKey.c,brutal:dKey.brutal};
+        const baseA={n:an,c:ac,nD:aKey.n,cD:aKey.c,brutal:aKey.brutal,shock:aKey.shock,shockUsed:false};
+        const baseD={n:dn,c:dc,nD:dKey.n,cD:dKey.c,brutal:dKey.brutal,shock:dKey.shock,shockUsed:false};
         const aChoices=aKey.preBlock?preBlockChoices(baseA,baseD):[{own:{...baseA},opp:{...baseD}}];
         const all=[];
         for(const acs of aChoices){
@@ -9013,7 +9260,7 @@ function ktCalc(cfg) {
   }
 
   function mWeapon(prefix){
-    return {attacks:ms[prefix+'Attacks'],hit:clamp(ms[prefix+'Hit']-(ms[prefix+'HitMod']||0)+(ms[prefix+'ChargeSupport']? -1:0),2,6),n:Math.max(0,ms[prefix+'N']),c:Math.max(0,ms[prefix+'C']),wounds:Math.max(0,ms[prefix+'Wounds']),lethal:ms[prefix+'Lethal'],balanced:ms[prefix+'Balanced'],ceaseless:ms[prefix+'Ceaseless'],relentless:ms[prefix+'Relentless'],punishing:ms[prefix+'Punishing'],rending:ms[prefix+'Rending'],severe:ms[prefix+'Severe'],brutal:ms[prefix+'Brutal'],doubleStrike:ms[prefix+'DoubleStrike'],preBlock:ms[prefix+'PreBlock']};
+    return {attacks:ms[prefix+'Attacks'],hit:clamp(ms[prefix+'Hit']-(ms[prefix+'HitMod']||0)+(ms[prefix+'ChargeSupport']? -1:0),2,6),n:Math.max(0,ms[prefix+'N']),c:Math.max(0,ms[prefix+'C']),wounds:Math.max(0,ms[prefix+'Wounds']),lethal:ms[prefix+'Lethal'],balanced:ms[prefix+'Balanced'],ceaseless:ms[prefix+'Ceaseless'],relentless:ms[prefix+'Relentless'],punishing:ms[prefix+'Punishing'],rending:ms[prefix+'Rending'],severe:ms[prefix+'Severe'],brutal:ms[prefix+'Brutal'],shock:ms[prefix+'Shock'],doubleStrike:ms[prefix+'DoubleStrike'],preBlock:ms[prefix+'PreBlock']};
   }
   function mRender(skipCalculation=false,typingEl=null){
     document.querySelectorAll('#meleeCalcSection [data-mcalc]').forEach(el=>{const k=el.dataset.mcalc,v=ms[k];if(el===typingEl)return;if(el.type==='checkbox')el.checked=!!v;else if(el.classList.contains('calc-display')){el.textContent=(k==='aLethal'||k==='dLethal')?(v?' '+v+'+':'None'):v+'+';}else el.value=v;});
